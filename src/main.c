@@ -6,6 +6,24 @@
 
 typedef enum
 {
+	NODE_TYPE_NONE,
+	NODE_TYPE_ROOT,
+	NODE_TYPE_CHILD,
+	NODE_TYPE_CHILD_2,
+	NODE_TYPE_CHILD_3,
+	NODE_TYPE_COUNT
+} NodeType;
+
+char* nodeTypeDescription[100] = {
+	"None",
+	"Root",
+	"Child #1",
+	"Child #2",
+	"Child #3"
+};
+
+typedef enum
+{
 	COMPONENT_TYPE_NONE,
 	COMPONENT_TYPE_POSITION,
 	COMPONENT_TYPE_RIGID_BODY,
@@ -14,11 +32,13 @@ typedef enum
 } ComponentType;
 
 struct Component;
+struct Node;
 
 typedef struct 
 {
 	ComponentType type;
 	struct Component* next;
+	struct Node* parent;
 } Component;
 
 typedef struct
@@ -27,38 +47,48 @@ typedef struct
 	float x, y;
 } ComponentPosition;
 
-struct Node;
-
 typedef struct
 {
+	NodeType type;
+	struct Node* next;
 	struct Node* children;
-	struct Node* sibling;
 	Component* components;
 } Node;
 
-Node* createNode()
+Node* nodeCreate()
 {
 	Node* node = __malloc__(sizeof(Node));
-	node->sibling = NULL;
 	node->components = NULL;
+	node->next = NULL;
+	node->children = NULL;
 	return node;
+}
+
+void nodeAddComponent(Node* _this, Component* component)
+{
+	Component* lastComponent = _this->components;
+	while(lastComponent->next != NULL)
+	{
+		lastComponent = lastComponent->next;
+	}
+	lastComponent->next = component;
 }
 
 void nodeAddSibling(Node* _this, Node* sibling)
 {
-	if(_this->sibling == NULL)
+	if(_this->next == NULL)
 	{
-		_this->sibling = sibling;
+		_this->next = sibling;
 		return;
 	}
 
-	Node* lastSibling = _this->sibling;
-	while(lastSibling->sibling != NULL)
+	Node* lastSibling = _this->next;
+	while(lastSibling->next != NULL)
 	{
-		lastSibling = lastSibling->sibling;
+		lastSibling = lastSibling->next;
 	}
 
-	lastSibling->sibling = sibling;
+	lastSibling->next = sibling;
 }
 
 void nodeAddChild(Node* _this, Node* child)
@@ -72,13 +102,47 @@ void nodeAddChild(Node* _this, Node* child)
 	nodeAddSibling(_this->children, child);
 }
 
-void nodeAddComponent(Node *_this, Component* component)
+void traverseGraph(Node* root, void (*funPtr)(Node*))
 {
-	
+	if(root == NULL) return;
+	Node* lastChildren = root->children;
+	while(lastChildren != NULL)
+	{
+		Node* next = lastChildren->next;
+		traverseGraph(lastChildren, funPtr);
+		lastChildren = next;
+	}
+	funPtr(root);
+}
+
+void printNodeType(Node* node)
+{
+	printf("Node Type: %s\n", nodeTypeDescription[node->type]);
+}
+
+void freeNode(Node* node)
+{
+	__free__(node);
 }
 
 int main(void)
 {
+	Node* root = nodeCreate();
+	root->type = NODE_TYPE_ROOT;
+	Node* child = nodeCreate();
+	child->type = NODE_TYPE_CHILD;
+	nodeAddChild(root, child);
+
+	child = nodeCreate();
+	child->type = NODE_TYPE_CHILD;
+	nodeAddChild(root, child);
+
+	Node* child2 = nodeCreate();
+	child2->type = NODE_TYPE_CHILD_2;
+	nodeAddChild(child, child2);
+
+	traverseGraph(root, printNodeType);
+	traverseGraph(root, freeNode);
 	printf("Hello World!!\n");
 	return 0;
 }
