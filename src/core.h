@@ -3,10 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define __malloc__ malloc
-#define __realloc__ realloc
-#define __free__ free
-
 typedef enum
 {
 	NODE_TYPE_NONE,
@@ -54,7 +50,7 @@ typedef struct
 
 Node* nodeCreate()
 {
-	Node* node = __malloc__(sizeof(Node));
+	Node* node = malloc(sizeof(Node));
 	node->components = NULL;
 	node->next = NULL;
 	node->children = NULL;
@@ -130,9 +126,9 @@ void freeNode(Node* node)
 	while(component != NULL)
 	{
 		Component* next = component->next;
-		__free__(component);
+		free(component);
 		component = next;
 	}
-	__free__(node);
+	free(node);
 }
 #endif
