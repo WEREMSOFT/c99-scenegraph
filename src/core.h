@@ -63,6 +63,13 @@ Node* nodeCreate()
 
 void nodeAddComponent(Node* _this, Component* component)
 {
+	if(_this->components == NULL)
+	{
+		component->parent = _this;
+		_this->components = component;
+		return;
+	}
+
 	Component* lastComponent = _this->components;
 	while(lastComponent->next != NULL)
 	{
@@ -119,6 +126,13 @@ void printNodeType(Node* node)
 
 void freeNode(Node* node)
 {
+	Component* component = node->components;
+	while(component != NULL)
+	{
+		Component* next = component->next;
+		__free__(component);
+		component = next;
+	}
 	__free__(node);
 }
 #endif

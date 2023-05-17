@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "core.h"
 #include "components.h"
+
 int main(void)
 {
 	Node* root = nodeCreate();
@@ -16,6 +17,13 @@ int main(void)
 	Node* child2 = nodeCreate();
 	child2->type = NODE_TYPE_CHILD_2;
 	nodeAddChild(child, child2);
+
+	{
+		Component* component = componentPositionCreate();
+		nodeAddComponent(root, component);
+	}
+
+	nodeComponentUpdate(root, 1.);
 
 	traverseGraph(root, printNodeType);
 	traverseGraph(root, freeNode);
