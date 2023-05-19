@@ -1,15 +1,44 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include <assert.h>
 #include "core.h"
+#include "gameObjects/gameObject.h"
+#include "gameObjects/tree.h"
 
 typedef struct Game
 {
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+	SDL_Texture* texture;
+	SDL_Rect textureRect;
 	Node* root;
 	bool isRunning;
 } Game;
+
+void updateComponentCallback(Node* node, Game* game)
+{
+	GameObject* gameObject = (GameObject*)node;
+	if(gameObject->update != NULL)
+		gameObject->update(gameObject, 1.);
+}
+
+void nodeComponentUpdate(Node* node, void* game)
+{
+	traverseGraph(node, game, (TraverseNodeCallback)updateComponentCallback);
+}
+
+void renderComponentCallback(Node* node, Game* game)
+{
+	GameObject* gameObject = (GameObject*)node;
+	if(gameObject->draw != NULL)
+		gameObject->draw(gameObject, game->renderer);
+}
+
+void gameObjectRender(Node* node, void* game)
+{
+	traverseGraph(node, game, (TraverseNodeCallback)renderComponentCallback);
+}
 
 Game gameCreate()
 {
@@ -34,6 +63,12 @@ Game gameCreate()
  	game.renderer = SDL_CreateRenderer(game.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	assert(game.renderer != NULL && "Error creating renderer");
+	
+
+	SDL_Surface* surface = IMG_Load("assets/tree.png");
+	game.texture = SDL_CreateTextureFromSurface(game.renderer, surface);
+	game.textureRect = (SDL_Rect){0, 0, surface->w, surface->h};
+	SDL_FreeSurface(surface);
 
 	return game;
 }
@@ -43,30 +78,21 @@ void gameRender(Game game)
 	SDL_SetRenderDrawColor(game.renderer, 21, 21, 21, 255);
 	SDL_RenderClear(game.renderer);
 	
+	traverseGraph(game.root, &game, gameObjectRender);
+
 	SDL_RenderPresent(game.renderer);
 }
 
 void gameInit(Game *game)
 {
-	game->root = nodeCreate();
+	game->root = (Node*)gameObjectCreate();
 	game->root->type = NODE_TYPE_ROOT;
 	{
-		Node* child = nodeCreate();
-		child->type = NODE_TYPE_CHILD;
-		nodeAddChild(game->root, child);
+		Tree* child = treeCreate((float[]){0, 0}, 1., game->texture);
+		child->header.type = NODE_TYPE_CHILD;
+		nodeAddChild(game->root, (Node*)child);
 	}
-	{
-		Node *child = nodeCreate();
-		child->type = NODE_TYPE_CHILD;
-		nodeAddChild(game->root, child);
-		Node* child2 = nodeCreate();
-		child2->type = NODE_TYPE_CHILD_2;
-		nodeAddChild(child, child2);
-	}
-	{
-		Component* component = componentPositionCreate();
-		nodeAddComponent(game->root, component);
-	}
+
 }
 
 void gameUpdate(Game* game)
@@ -88,15 +114,14 @@ void gameUpdate(Game* game)
 
 			}
 		}
-		nodeComponentUpdate(game->root);
-		traverseGraph(game->root, printNodeType);
+		nodeComponentUpdate(game->root, game);
 		gameRender(*game);
 	}
 }
 
 void gameDestroy(Game game)
 {
-	traverseGraph(game.root, freeNode);
+	traverseGraph(game.root, &game, freeNode);
 	SDL_DestroyRenderer(game.renderer);
 	SDL_DestroyWindow(game.window);
 	SDL_Quit();

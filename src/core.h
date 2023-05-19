@@ -30,6 +30,7 @@ typedef enum
 	COMPONENT_TYPE_COUNT
 } ComponentType;
 
+
 struct Component;
 struct Node;
 
@@ -45,33 +46,14 @@ typedef struct
 	NodeType type;
 	struct Node* next;
 	struct Node* children;
-	Component* components;
 } Node;
 
 Node* nodeCreate()
 {
-	Node* node = malloc(sizeof(Node));
-	node->components = NULL;
+	Node* node = (Node*)malloc(sizeof(Node));
 	node->next = NULL;
 	node->children = NULL;
 	return node;
-}
-
-void nodeAddComponent(Node* _this, Component* component)
-{
-	if(_this->components == NULL)
-	{
-		component->parent = _this;
-		_this->components = component;
-		return;
-	}
-
-	Component* lastComponent = _this->components;
-	while(lastComponent->next != NULL)
-	{
-		lastComponent = lastComponent->next;
-	}
-	lastComponent->next = component;
 }
 
 void nodeAddSibling(Node* _this, Node* sibling)
@@ -102,17 +84,19 @@ void nodeAddChild(Node* _this, Node* child)
 	nodeAddSibling(_this->children, child);
 }
 
-void traverseGraph(Node* root, void (*funPtr)(Node*))
+typedef void (*TraverseNodeCallback)(Node*, void*);
+
+void traverseGraph(Node* root, void* context, TraverseNodeCallback funPtr)
 {
 	if(root == NULL) return;
 	Node* lastChildren = root->children;
 	while(lastChildren != NULL)
 	{
 		Node* next = lastChildren->next;
-		traverseGraph(lastChildren, funPtr);
+		traverseGraph(lastChildren, context, funPtr);
 		lastChildren = next;
 	}
-	funPtr(root);
+	funPtr(root, context);
 }
 
 void printNodeType(Node* node)
@@ -122,13 +106,6 @@ void printNodeType(Node* node)
 
 void freeNode(Node* node)
 {
-	Component* component = node->components;
-	while(component != NULL)
-	{
-		Component* next = component->next;
-		free(component);
-		component = next;
-	}
 	free(node);
 }
 #endif
