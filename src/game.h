@@ -23,21 +23,11 @@ void updateComponentCallback(Node* node, Game* game)
 		gameObject->update(gameObject, 1.);
 }
 
-void nodeComponentUpdate(Node* node, void* game)
-{
-	traverseGraph(node, game, (TraverseNodeCallback)updateComponentCallback);
-}
-
 void renderComponentCallback(Node* node, Game* game)
 {
 	GameObject* gameObject = (GameObject*)node;
 	if(gameObject->draw != NULL)
 		gameObject->draw(gameObject, game->renderer);
-}
-
-void gameObjectRender(Node* node, void* game)
-{
-	traverseGraph(node, game, (TraverseNodeCallback)renderComponentCallback);
 }
 
 Game gameCreate()
@@ -73,16 +63,6 @@ Game gameCreate()
 	return game;
 }
 
-void gameRender(Game game)
-{
-	SDL_SetRenderDrawColor(game.renderer, 21, 21, 21, 255);
-	SDL_RenderClear(game.renderer);
-	
-	traverseGraph(game.root, &game, gameObjectRender);
-
-	SDL_RenderPresent(game.renderer);
-}
-
 void gameInit(Game *game)
 {
 	game->root = (Node*)gameObjectCreate();
@@ -95,7 +75,17 @@ void gameInit(Game *game)
 
 }
 
-void gameUpdate(Game* game)
+void gameRender(Game game)
+{
+	SDL_SetRenderDrawColor(game.renderer, 21, 21, 21, 255);
+	SDL_RenderClear(game.renderer);
+	
+	traverseGraph(game.root, &game, (TraverseNodeCallback)renderComponentCallback);
+
+	SDL_RenderPresent(game.renderer);
+}
+
+void gameRun(Game* game)
 {
 	while(game->isRunning)
 	{
@@ -114,7 +104,7 @@ void gameUpdate(Game* game)
 
 			}
 		}
-		nodeComponentUpdate(game->root, game);
+		traverseGraph(game->root, game, (TraverseNodeCallback)updateComponentCallback);
 		gameRender(*game);
 	}
 }

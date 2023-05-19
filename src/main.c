@@ -9,7 +9,7 @@ int main(void)
 {
 	Game game = gameCreate();
 	gameInit(&game);
-	gameUpdate(&game);
+	gameRun(&game);
 	gameDestroy(game);
 	return 0;
 }
