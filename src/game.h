@@ -1,3 +1,9 @@
+#ifndef __GAME_H__
+#define __GAME_H__
+#else
+#error "game.h already included somewhere else"
+#endif
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
@@ -5,22 +11,13 @@
 #include "core.h"
 #include "gameObjects/gameObject.h"
 #include "gameObjects/tree.h"
-
-typedef struct Game
-{
-	SDL_Window* window;
-	SDL_Renderer* renderer;
-	SDL_Texture* texture;
-	SDL_Rect textureRect;
-	Node* root;
-	bool isRunning;
-} Game;
+#include "game_t.h"
 
 void updateComponentCallback(Node* node, Game* game)
 {
 	GameObject* gameObject = (GameObject*)node;
 	if(gameObject->update != NULL)
-		gameObject->update(gameObject, 1.);
+		gameObject->update(gameObject, game);
 }
 
 void renderComponentCallback(Node* node, Game* game)
@@ -68,7 +65,7 @@ void gameInit(Game *game)
 	game->root = (Node*)gameObjectCreate();
 	game->root->type = NODE_TYPE_ROOT;
 	{
-		Tree* child = treeCreate((float[]){0, 0}, 1., game->texture);
+		Tree* child = treeCreate((float[]){0, 0}, 100., game->texture);
 		child->header.type = NODE_TYPE_CHILD;
 		nodeAddChild(game->root, (Node*)child);
 	}
@@ -80,15 +77,18 @@ void gameRender(Game game)
 	SDL_SetRenderDrawColor(game.renderer, 21, 21, 21, 255);
 	SDL_RenderClear(game.renderer);
 	
-	traverseGraph(game.root, &game, (TraverseNodeCallback)renderComponentCallback);
+	traverseGraph(game.root, &game, renderComponentCallback);
 
 	SDL_RenderPresent(game.renderer);
 }
 
 void gameRun(Game* game)
 {
+	float lastFrameTime = SDL_GetTicks();
 	while(game->isRunning)
 	{
+		game->deltaTime = (SDL_GetTicks() - lastFrameTime) / 1000. ;
+		lastFrameTime = SDL_GetTicks();
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
@@ -100,8 +100,15 @@ void gameRun(Game* game)
 					break;
 				case SDL_KEYDOWN:
 					if(event.key.keysym.sym == SDLK_ESCAPE)
+					{
 						game->isRunning = false;
-
+						break;
+					}
+					game->keys[event.key.keysym.scancode] = true;
+					break;
+				case SDL_KEYUP:
+					game->keys[event.key.keysym.scancode] = false;
+					break;
 			}
 		}
 		traverseGraph(game->root, game, (TraverseNodeCallback)updateComponentCallback);

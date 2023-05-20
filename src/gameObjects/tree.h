@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include "../game_t.h"
 #include "../core.h"
 #include "gameObject.h"
 
@@ -11,9 +12,24 @@ void treeDraw(Tree* _this, SDL_Renderer* renderer)
 	SDL_RenderCopyEx(renderer, _this->texture, &((SDL_Rect){0, 0, 16, 32}), &((SDL_Rect){x, y, 16, 32}), 0, NULL, SDL_FLIP_NONE);
 }
 
-void treeUpdate(Tree* _this, float deltaTime)
+void treeUpdate(Tree* _this, Game* game)
 {
-	_this->position[0] += _this->speed * deltaTime;
+	if(game->keys[SDL_SCANCODE_LEFT])
+	{
+		_this->position[0] -= _this->speed * game->deltaTime;
+	}
+	if(game->keys[SDL_SCANCODE_RIGHT])
+	{
+		_this->position[0] += _this->speed * game->deltaTime;
+	}
+	if(game->keys[SDL_SCANCODE_UP])
+	{
+		_this->position[1] -= _this->speed * game->deltaTime;
+	}
+	if(game->keys[SDL_SCANCODE_DOWN])
+	{
+		_this->position[1] += _this->speed * game->deltaTime;
+	}
 }
 
 Tree* treeCreate(float position[2], float speed, SDL_Texture* texture)
