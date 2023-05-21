@@ -67,7 +67,7 @@ Game gameCreate()
 	return game;
 }
 
-void fakeFunction(void* c, int sarasa)
+void fakeFunction(void)
 {
 	printf("this is a test/n");
 }
@@ -77,7 +77,6 @@ void gameInit(Game *game)
 	game->root = (Node*)gameObjectCreate();
 	game->root->type = NODE_TYPE_ROOT;
 
-	gameObjectAssignDrawFunctionCallback(game->root, fakeFunction);
 	{
 		Tree* child = treeCreate((float[]){0, 0}, 100., game->texture);
 		child->header.type = NODE_TYPE_CHILD;

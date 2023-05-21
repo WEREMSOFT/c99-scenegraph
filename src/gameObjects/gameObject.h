@@ -18,27 +18,6 @@ typedef struct
 	DrawFunction draw;
 } GameObject;
 
-
-// Define a compile-time error message
-struct compile_time_error;
-
-// Perform compile-time assertion to validate signature compatibility
-#define STATIC_ASSERT(expr, msg) \
-    extern struct compile_time_error { int error_if_negative : (expr) ? 1 : -1; }
-
-
-void gameObjectAssignUpdateFunctionCallback(GameObject* _this, UpdateFunction updateCallback)
-{
-	STATIC_ASSERT(sizeof(updateCallback) == sizeof(UpdateFunction), "invalid update function signature");
-	_this->update = updateCallback;
-}
-
-void gameObjectAssignDrawFunctionCallback(GameObject* _this, DrawFunction drawCallback)
-{
-	STATIC_ASSERT(sizeof(drawCallback) == sizeof(DrawFunction), "invalid draw function signature");
-	_this->update = drawCallback;
-}
-
 GameObject* gameObjectCreate()
 {
 	GameObject go = {0};
