@@ -6,11 +6,13 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include <assert.h>
 #include "core.h"
 #include "gameObjects/gameObject.h"
 #include "gameObjects/tree.h"
+#include "gameObjects/frameCounter.h"
 #include "game_t.h"
 
 void updateComponentCallback(Node* node, Game* game)
@@ -56,29 +58,42 @@ Game gameCreate()
 	game.texture = SDL_CreateTextureFromSurface(game.renderer, surface);
 	game.textureRect = (SDL_Rect){0, 0, surface->w, surface->h};
 	SDL_FreeSurface(surface);
+	assert(TTF_Init() >= 0 && "Error initilizing font library");
+
+	game.font = TTF_OpenFont("assets/fonts/charriot.ttf", 12);
+
+	assert(game.font != NULL && "Error loading font");
 
 	return game;
+}
+
+void fakeFunction(void* c, int sarasa)
+{
+	printf("this is a test/n");
 }
 
 void gameInit(Game *game)
 {
 	game->root = (Node*)gameObjectCreate();
 	game->root->type = NODE_TYPE_ROOT;
+
+	gameObjectAssignDrawFunctionCallback(game->root, fakeFunction);
 	{
 		Tree* child = treeCreate((float[]){0, 0}, 100., game->texture);
 		child->header.type = NODE_TYPE_CHILD;
 		nodeAddChild(game->root, (Node*)child);
 	}
-
+	{
+		FrameCounter* fc = frameCounterCreate(game->font);
+		nodeAddChild(game->root, (Node*)fc);
+	}
 }
 
 void gameRender(Game game)
 {
 	SDL_SetRenderDrawColor(game.renderer, 21, 21, 21, 255);
 	SDL_RenderClear(game.renderer);
-	
 	traverseGraph(game.root, &game, renderComponentCallback);
-
 	SDL_RenderPresent(game.renderer);
 }
 
@@ -119,6 +134,8 @@ void gameRun(Game* game)
 void gameDestroy(Game game)
 {
 	traverseGraph(game.root, &game, freeNode);
+	TTF_CloseFont(game.font);
+    TTF_Quit();
 	SDL_DestroyRenderer(game.renderer);
 	SDL_DestroyWindow(game.window);
 	SDL_Quit();

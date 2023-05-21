@@ -1,7 +1,7 @@
 SRC_F := $(shell find src -name *.c) $(shell find libs -name *.c)
 OBJ_FOR_CLEAN_F := $(shell find ./src -name *.o)
 SRC_O := $(patsubst %.c,%.o,$(SRC_F))
-CC := clang
+CC := gcc
 LIBSOLD := -lSDL2 -llua5.3 -lSDL2_ttf -lSDL2_mixer -lSDL2_image -lm -lcimgui_sdl -lGL -lstdc++
 LIBS := -lSDL2 -llua5.3 -lSDL2_ttf -lSDL2_mixer -lSDL2_image -lm -lGL
 
@@ -10,7 +10,7 @@ LIBS := -lSDL2 -llua5.3 -lSDL2_ttf -lSDL2_mixer -lSDL2_image -lm -lGL
 FLAGS_DEBUG := -g -O0 -w 
 FLAGS_DEBUG_MEM := -g -O0 -w -fsanitize=address
 FLAGS__DEBUG := -O3 -fsanitize=address
-FLAGS := -Wall -Wextra -Wfatal-errors -Weverything -pedantic -Werror -std=gnu99 -Wpedantic -Werror -Wshadow -Ilibs/include -Llibs
+FLAGS := -Wall -Wextra -Wfatal-errors -pedantic -Werror -std=gnu99 -Wpedantic -Werror -Wshadow -Ilibs/include -Llibs
 
 TARGET := bin/main.bin
 

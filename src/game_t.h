@@ -12,6 +12,7 @@ typedef struct Game
 	SDL_Renderer* renderer;
 	SDL_Texture* texture;
 	SDL_Rect textureRect;
+	TTF_Font* font;
 	bool keys[256];
 	Node* root;
 	bool isRunning;
