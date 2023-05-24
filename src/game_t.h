@@ -5,16 +5,15 @@
 #include <stdbool.h>
 #include <assert.h>
 #include "core.h"
+#include "core/assetManager.h"
 
 typedef struct Game
 {
 	SDL_Window* window;
 	SDL_Renderer* renderer;
-	SDL_Texture* texture;
-	SDL_Rect textureRect;
-	TTF_Font* font;
-	bool keys[256];
 	Node* root;
+	AssetManager assetManager;
+	bool keys[256];
 	bool isRunning;
 	float deltaTime;
 } Game;

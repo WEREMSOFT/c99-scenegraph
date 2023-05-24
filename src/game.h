@@ -52,17 +52,8 @@ Game gameCreate()
  	game.renderer = SDL_CreateRenderer(game.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	assert(game.renderer != NULL && "Error creating renderer");
-	
 
-	SDL_Surface* surface = IMG_Load("assets/tree.png");
-	game.texture = SDL_CreateTextureFromSurface(game.renderer, surface);
-	game.textureRect = (SDL_Rect){0, 0, surface->w, surface->h};
-	SDL_FreeSurface(surface);
-	assert(TTF_Init() >= 0 && "Error initilizing font library");
-
-	game.font = TTF_OpenFont("assets/fonts/charriot.ttf", 12);
-
-	assert(game.font != NULL && "Error loading font");
+	game.assetManager = assetManagerInit(game.renderer);
 
 	return game;
 }
@@ -78,12 +69,12 @@ void gameInit(Game *game)
 	game->root->type = NODE_TYPE_ROOT;
 
 	{
-		Tree* child = treeCreate((float[]){0, 0}, 100., game->texture);
+		Tree* child = treeCreate((float[]){0, 0}, 100., game->assetManager.textures[ASSET_IMAGE_TREE]);
 		child->header.type = NODE_TYPE_CHILD;
 		nodeAddChild(game->root, (Node*)child);
 	}
 	{
-		FrameCounter* fc = frameCounterCreate(game->font);
+		FrameCounter* fc = frameCounterCreate(game->assetManager.fonts[ASSET_FONT_CHARRIOT]);
 		nodeAddChild(game->root, (Node*)fc);
 	}
 }
@@ -133,8 +124,7 @@ void gameRun(Game* game)
 void gameDestroy(Game game)
 {
 	traverseGraph(game.root, &game, freeNode);
-	TTF_CloseFont(game.font);
-    TTF_Quit();
+	assetManagerDestroy(game.assetManager);
 	SDL_DestroyRenderer(game.renderer);
 	SDL_DestroyWindow(game.window);
 	SDL_Quit();
