@@ -10,9 +10,18 @@ typedef void(*DrawFunction)(const void*, const SDL_Renderer*);
 
 typedef struct
 {
+	int framePerSecond;
+	int frameCount;
+	int currentFrame;
+	SDL_Rect size;
+} Animation;
+
+typedef struct
+{
 	Node header;
 	float position[2];
 	float speed;
+	Animation animation;
 	SDL_Texture* texture;
 	UpdateFunction update;
 	DrawFunction draw;
@@ -24,6 +33,11 @@ GameObject* gameObjectCreate()
 	GameObject* gameObject = malloc(sizeof(GameObject));
 	*gameObject = go;
 	return gameObject;
+}
+
+SDL_Rect processAnimationFrame()
+{
+
 }
 
 #endif
