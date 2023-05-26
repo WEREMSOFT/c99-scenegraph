@@ -37,7 +37,6 @@ GameObject* gameObjectCreate()
 
 SDL_Rect processAnimationFrame()
 {
-
 }
 
 #endif
