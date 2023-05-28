@@ -12,6 +12,7 @@
 #include "core.h"
 #include "gameObjects/gameObject.h"
 #include "gameObjects/tree.h"
+#include "gameObjects/chopter.h"
 #include "gameObjects/frameCounter.h"
 #include "game_t.h"
 
@@ -34,6 +35,9 @@ Game gameCreate()
 	Game game = {0};
 	game.isRunning = true;
 
+	game.screenSize[0] = 800;
+	game.screenSize[1] = 600;
+
 	assert(SDL_Init(SDL_INIT_EVERYTHING) == 0 && "Error initializing SDL\n");
 
 	SDL_DisplayMode displayMode;
@@ -43,8 +47,8 @@ Game gameCreate()
 		NULL,
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		800,
-		600,
+		game.screenSize[0],
+		game.screenSize[1],
 		0);
 
 	assert(game.window != NULL && "Error creating SDL window");
@@ -58,18 +62,22 @@ Game gameCreate()
 	return game;
 }
 
-void fakeFunction(void)
-{
-	printf("this is a test/n");
-}
-
 void gameInit(Game *game)
 {
 	game->root = (Node*)gameObjectCreate();
 	game->root->type = NODE_TYPE_ROOT;
 
+	int padding[2] = { game->screenSize[0] / 10, game->screenSize[1] / 10};
+	for(int i = 0; i < 10; i++)
+		for(int j = 0; j < 10; j++)
+		{
+			Tree* child = treeCreate((float[]){i * padding[0] + 20, j * padding[1] + 20}, 100., game->assetManager.textures[ASSET_IMAGE_TREE]);
+			child->header.type = NODE_TYPE_CHILD;
+			nodeAddChild(game->root, (Node*)child);
+		}
+
 	{
-		Tree* child = treeCreate((float[]){0, 0}, 100., game->assetManager.textures[ASSET_IMAGE_TREE]);
+		Chopter* child = chopterCreate((float[]){0, 0}, 100., game->assetManager.textures[ASSET_IMAGE_CHOPTER_SPRITESHEET]);
 		child->header.type = NODE_TYPE_CHILD;
 		nodeAddChild(game->root, (Node*)child);
 	}
@@ -79,8 +87,17 @@ void gameInit(Game *game)
 	}
 }
 
+int compareGameObjectForZSorting(GameObject* a, GameObject* b)
+{
+	int returnValue = (a->rigidBody.position[1] + 10) - (b->rigidBody.position[1] + 10);
+	return returnValue;
+}
+
 void gameRender(Game game)
 {
+	// TODO: THIS SORT WORKS AWFUL;
+	// sortLinkedList(&game.root->children, compareGameObjectForZSorting);
+
 	SDL_SetRenderDrawColor(game.renderer, 21, 21, 21, 255);
 	SDL_RenderClear(game.renderer);
 	traverseGraph(game.root, &game, renderComponentCallback);

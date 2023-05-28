@@ -14,12 +14,12 @@ typedef struct
 	int frameCount;
 	int currentFrame;
 	int startTime;
-	float frameSize[2];
 } Animation;
 
 typedef struct 
 {
 	SDL_Rect srcRect;
+	SDL_Rect destRect;
 	SDL_Texture* texture;
 	Animation animation;
 	bool isAnimated;
@@ -59,8 +59,52 @@ Animation animationCreate(int frameCount, int framesPerSecond, bool isLoop)
 SDL_Rect processAnimationFrame(GameObject* _this)
 {
 	Sprite* sprite = &_this->sprite;
-	Animation* animation;
+	Animation* animation = &sprite->animation;
 	animation->currentFrame = ((SDL_GetTicks() - animation->startTime) * animation->framesPerSecond / 1000) % animation->frameCount;
-	sprite->srcRect.x = animation->currentFrame * animation->frameSize[0];
+	sprite->srcRect.x = animation->currentFrame * sprite->srcRect.w;
 }
+
+// Sort linked list of childs
+typedef int (*Comparator)(const void*, const void*);
+
+void swapData(GameObject* a, GameObject* b) {
+    void* temp = a->header.next;
+
+	GameObject* prevA = a->header.prev;
+	GameObject* prevB = b->header.prev;
+
+	if(prevA != NULL)
+	{
+		prevA->header.next = b;
+		b->header.prev = prevA;
+	}
+	if(prevB != NULL)
+	{
+		prevB->header.next = a;
+		a->header.prev = prevB;
+	}
+}
+
+void sortLinkedList(GameObject** head, Comparator compare) {
+    if (*head == NULL || (*head)->header.next == NULL)
+        return;
+
+    int swapped;
+    GameObject* ptr1;
+    GameObject* lptr = NULL;
+
+    do {
+        swapped = 0;
+        ptr1 = *head;
+        while (ptr1 != NULL && ptr1->header.next != NULL) {
+            if (compare(ptr1, ptr1->header.next) > 0) {
+                swapData(ptr1, ptr1->header.next);
+                swapped = 1;
+            }
+            ptr1 = ptr1->header.next;
+        }
+        lptr = ptr1;
+    } while (swapped);
+}
+
 #endif

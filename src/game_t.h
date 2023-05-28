@@ -16,5 +16,6 @@ typedef struct Game
 	bool keys[256];
 	bool isRunning;
 	float deltaTime;
+	int screenSize[2];
 } Game;
 #endif

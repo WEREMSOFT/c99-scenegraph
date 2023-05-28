@@ -45,6 +45,7 @@ typedef struct
 {
 	NodeType type;
 	struct Node* next;
+	struct Node* prev;
 	struct Node* children;
 } Node;
 
@@ -61,6 +62,7 @@ void nodeAddSibling(Node* _this, Node* sibling)
 	if(_this->next == NULL)
 	{
 		_this->next = sibling;
+		sibling->prev = _this;
 		return;
 	}
 
@@ -71,6 +73,7 @@ void nodeAddSibling(Node* _this, Node* sibling)
 	}
 
 	lastSibling->next = sibling;
+	sibling->prev = lastSibling;
 }
 
 void nodeAddChild(Node* _this, Node* child)

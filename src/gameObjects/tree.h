@@ -14,22 +14,6 @@ void treeDraw(Tree* _this, SDL_Renderer* renderer)
 
 void treeUpdate(Tree* _this, Game* game)
 {
-	if(game->keys[SDL_SCANCODE_LEFT])
-	{
-		_this->rigidBody.position[0] -= _this->rigidBody.speed * game->deltaTime;
-	}
-	if(game->keys[SDL_SCANCODE_RIGHT])
-	{
-		_this->rigidBody.position[0] += _this->rigidBody.speed * game->deltaTime;
-	}
-	if(game->keys[SDL_SCANCODE_UP])
-	{
-		_this->rigidBody.position[1] -= _this->rigidBody.speed * game->deltaTime;
-	}
-	if(game->keys[SDL_SCANCODE_DOWN])
-	{
-		_this->rigidBody.position[1] += _this->rigidBody.speed * game->deltaTime;
-	}
 }
 
 Tree* treeCreate(float position[2], float speed, SDL_Texture* texture)
