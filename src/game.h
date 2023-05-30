@@ -16,17 +16,22 @@
 #include "gameObjects/frameCounter.h"
 #include "game_t.h"
 
+#define MAX_NODES 500
+
+Node nodes[MAX_NODES] = {0};
+int nodesCount = 0;
+
 void updateComponentCallback(Node* node, Game* game)
 {
-	GameObject* gameObject = (GameObject*)node;
-	if(gameObject->update != NULL)
+	GameObject* gameObject = (GameObject*)node->data;
+	if(gameObject != NULL && gameObject->update != NULL)
 		gameObject->update(gameObject, game);
 }
 
 void renderComponentCallback(Node* node, Game* game)
 {
-	GameObject* gameObject = (GameObject*)node;
-	if(gameObject->draw != NULL)
+	GameObject* gameObject = (GameObject*)node->data;
+	if(gameObject != NULL && gameObject->draw != NULL)
 		gameObject->draw(gameObject, game->renderer);
 }
 
@@ -64,20 +69,20 @@ Game gameCreate()
 
 void gameInit(Game *game)
 {
-	game->root = (Node*)gameObjectCreate();
+	nodes[nodesCount++].data = gameObjectCreate();
+	game->root = &nodes[nodesCount-1];
 
 	int padding[2] = { game->screenSize[0] / 10, game->screenSize[1] / 10};
-	for(int i = 0; i < 10; i++)
-		for(int j = 0; j < 10; j++)
+	for(int i = 0; i < 1; i++)
+		for(int j = 0; j < 1; j++)
 		{
-			Node child = treeCreate((float[]){i * padding[0] + 20, j * padding[1] + 20}, 100., game->assetManager.textures[ASSET_IMAGE_TREE]);
-			nodeAddChild(game->root, child);
+			nodes[nodesCount++] = treeCreate((float[]){i * padding[0] + 20, j * padding[1] + 20}, 100., game->assetManager.textures[ASSET_IMAGE_TREE]);
+			nodeAddChild(game->root, &nodes[nodesCount-1]);
 		}
 
 	{
-		Chopter* child = chopterCreate((float[]){0, 0}, 100., game->assetManager.textures[ASSET_IMAGE_CHOPTER_SPRITESHEET]);
-		child->header.type = NODE_TYPE_CHILD;
-		nodeAddChild(game->root, (Node*)child);
+		nodes[nodesCount++] = chopterCreate((float[]){0, 0}, 100., game->assetManager.textures[ASSET_IMAGE_CHOPTER_SPRITESHEET]);
+		nodeAddChild(game->root, &nodes[nodesCount-1]);
 	}
 	{
 		FrameCounter* fc = frameCounterCreate(game->assetManager.fonts[ASSET_FONT_CHARRIOT]);
