@@ -37,11 +37,10 @@ void chopterUpdate(Chopter* _this, Game* game)
 	}
 }
 
-Chopter* chopterCreate(float position[2], float speed, SDL_Texture* texture)
+Node chopterCreate(float position[2], float speed, SDL_Texture* texture)
 {
-	Chopter* chopter = (Chopter*)malloc(sizeof(Chopter));
 	Node node = {0};
-	chopter->header = node;
+	Chopter* chopter = (Chopter*)malloc(sizeof(Chopter));
 	chopter->rigidBody.position[0] = position[0];
 	chopter->rigidBody.position[1] = position[1];
 	chopter->update = (UpdateFunction)chopterUpdate;
@@ -53,5 +52,6 @@ Chopter* chopterCreate(float position[2], float speed, SDL_Texture* texture)
 	chopter->sprite.animation.startTime = SDL_GetTicks();
 	chopter->sprite.animation.frameCount = 2;
 	chopter->sprite.animation.framesPerSecond = 10;
-	return chopter;
+	node.data = chopter;
+	return node;
 }

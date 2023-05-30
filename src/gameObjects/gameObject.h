@@ -33,7 +33,6 @@ typedef struct
 
 typedef struct
 {
-	Node header;
 	Sprite sprite;
 	RigidBody rigidBody;
 	UpdateFunction update;
@@ -67,44 +66,44 @@ SDL_Rect processAnimationFrame(GameObject* _this)
 // Sort linked list of childs
 typedef int (*Comparator)(const void*, const void*);
 
-void swapData(GameObject* a, GameObject* b) {
-    void* temp = a->header.next;
+// void swapData(GameObject* a, GameObject* b) {
+//     void* temp = a->header.next;
 
-	GameObject* prevA = a->header.prev;
-	GameObject* prevB = b->header.prev;
+// 	GameObject* prevA = a->header.prev;
+// 	GameObject* prevB = b->header.prev;
 
-	if(prevA != NULL)
-	{
-		prevA->header.next = b;
-		b->header.prev = prevA;
-	}
-	if(prevB != NULL)
-	{
-		prevB->header.next = a;
-		a->header.prev = prevB;
-	}
-}
+// 	if(prevA != NULL)
+// 	{
+// 		prevA->header.next = b;
+// 		b->header.prev = prevA;
+// 	}
+// 	if(prevB != NULL)
+// 	{
+// 		prevB->header.next = a;
+// 		a->header.prev = prevB;
+// 	}
+// }
 
-void sortLinkedList(GameObject** head, Comparator compare) {
-    if (*head == NULL || (*head)->header.next == NULL)
-        return;
+// void sortLinkedList(GameObject** head, Comparator compare) {
+//     if (*head == NULL || (*head)->header.next == NULL)
+//         return;
 
-    int swapped;
-    GameObject* ptr1;
-    GameObject* lptr = NULL;
+//     int swapped;
+//     GameObject* ptr1;
+//     GameObject* lptr = NULL;
 
-    do {
-        swapped = 0;
-        ptr1 = *head;
-        while (ptr1 != NULL && ptr1->header.next != NULL) {
-            if (compare(ptr1, ptr1->header.next) > 0) {
-                swapData(ptr1, ptr1->header.next);
-                swapped = 1;
-            }
-            ptr1 = ptr1->header.next;
-        }
-        lptr = ptr1;
-    } while (swapped);
-}
+//     do {
+//         swapped = 0;
+//         ptr1 = *head;
+//         while (ptr1 != NULL && ptr1->header.next != NULL) {
+//             if (compare(ptr1, ptr1->header.next) > 0) {
+//                 swapData(ptr1, ptr1->header.next);
+//                 swapped = 1;
+//             }
+//             ptr1 = ptr1->header.next;
+//         }
+//         lptr = ptr1;
+//     } while (swapped);
+// }
 
 #endif

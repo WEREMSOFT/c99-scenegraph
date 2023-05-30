@@ -2,51 +2,14 @@
 #define __CORE_H__
 #include <stdio.h>
 #include <stdlib.h>
-
-typedef enum
-{
-	NODE_TYPE_NONE,
-	NODE_TYPE_ROOT,
-	NODE_TYPE_CHILD,
-	NODE_TYPE_CHILD_2,
-	NODE_TYPE_CHILD_3,
-	NODE_TYPE_COUNT
-} NodeType;
-
-char* nodeTypeDescription[100] = {
-	"None",
-	"Root",
-	"Child #1",
-	"Child #2",
-	"Child #3"
-};
-
-typedef enum
-{
-	COMPONENT_TYPE_NONE,
-	COMPONENT_TYPE_POSITION,
-	COMPONENT_TYPE_RIGID_BODY,
-	COMPONENT_TYPE_RENDERER,
-	COMPONENT_TYPE_COUNT
-} ComponentType;
-
-
-struct Component;
 struct Node;
-
-typedef struct 
-{
-	ComponentType type;
-	struct Component* next;
-	struct Node* parent;
-} Component;
 
 typedef struct
 {
-	NodeType type;
 	struct Node* next;
 	struct Node* prev;
 	struct Node* children;
+	void* data;
 } Node;
 
 Node* nodeCreate()
@@ -100,11 +63,6 @@ void traverseGraph(Node* root, void* context, TraverseNodeCallback funPtr)
 		lastChildren = next;
 	}
 	funPtr(root, context);
-}
-
-void printNodeType(Node* node)
-{
-	printf("Node Type: %s\n", nodeTypeDescription[node->type]);
 }
 
 void freeNode(Node* node)

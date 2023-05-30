@@ -65,15 +65,13 @@ Game gameCreate()
 void gameInit(Game *game)
 {
 	game->root = (Node*)gameObjectCreate();
-	game->root->type = NODE_TYPE_ROOT;
 
 	int padding[2] = { game->screenSize[0] / 10, game->screenSize[1] / 10};
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 10; j++)
 		{
-			Tree* child = treeCreate((float[]){i * padding[0] + 20, j * padding[1] + 20}, 100., game->assetManager.textures[ASSET_IMAGE_TREE]);
-			child->header.type = NODE_TYPE_CHILD;
-			nodeAddChild(game->root, (Node*)child);
+			Node child = treeCreate((float[]){i * padding[0] + 20, j * padding[1] + 20}, 100., game->assetManager.textures[ASSET_IMAGE_TREE]);
+			nodeAddChild(game->root, child);
 		}
 
 	{

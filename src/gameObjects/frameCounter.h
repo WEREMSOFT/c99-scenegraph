@@ -39,7 +39,6 @@ void frameCounterDraw(FrameCounter* _this, SDL_Renderer* renderer)
 FrameCounter* frameCounterCreate(TTF_Font* font)
 {
 	FrameCounter* frameCounter = calloc(1, sizeof(FrameCounter));
-	frameCounter->parent.header.type = NODE_TYPE_CHILD_2;
 	frameCounter->textColor.r = 255;
 	frameCounter->textColor.g = 255;
 	frameCounter->textColor.b = 255;

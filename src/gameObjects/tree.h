@@ -16,16 +16,16 @@ void treeUpdate(Tree* _this, Game* game)
 {
 }
 
-Tree* treeCreate(float position[2], float speed, SDL_Texture* texture)
+Node treeCreate(float position[2], float speed, SDL_Texture* texture)
 {
-	Tree* tree = (Tree*)malloc(sizeof(Tree));
 	Node node = {0};
-	tree->header = node;
+	Tree* tree = (Tree*)malloc(sizeof(Tree));
 	tree->rigidBody.position[0] = position[0];
 	tree->rigidBody.position[1] = position[1];
 	tree->update = (UpdateFunction)treeUpdate;
 	tree->draw = (DrawFunction)treeDraw;
 	tree->rigidBody.speed = speed;
 	tree->sprite.texture = texture;
-	return tree;
+	node.data = tree;
+	return node;
 }
