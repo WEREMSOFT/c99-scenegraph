@@ -67,6 +67,6 @@ void traverseGraph(Node* root, void* context, TraverseNodeCallback funPtr)
 
 void freeNode(Node* node)
 {
-	free(node);
+	free(node->data);
 }
 #endif

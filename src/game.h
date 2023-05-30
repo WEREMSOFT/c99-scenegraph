@@ -16,10 +16,16 @@
 #include "gameObjects/frameCounter.h"
 #include "game_t.h"
 
-#define MAX_NODES 500
+#define MAX_NODES 100000
 
 Node nodes[MAX_NODES] = {0};
 int nodesCount = 0;
+
+Node* getFreeNode()
+{
+	assert(nodesCount+1 < MAX_NODES && "Max amount of nodes reached");
+	return &nodes[nodesCount++];
+}
 
 void updateComponentCallback(Node* node, Game* game)
 {
@@ -72,34 +78,69 @@ void gameInit(Game *game)
 	nodes[nodesCount++].data = gameObjectCreate();
 	game->root = &nodes[nodesCount-1];
 
-	int padding[2] = { game->screenSize[0] / 10, game->screenSize[1] / 10};
-	for(int i = 0; i < 1; i++)
-		for(int j = 0; j < 1; j++)
+	int padding[2] = { game->screenSize[0] / 100, game->screenSize[1] / 100};
+	for(int i = 0; i < 110; i++)
+		for(int j = 0; j < 110; j++)
 		{
-			nodes[nodesCount++] = treeCreate((float[]){i * padding[0] + 20, j * padding[1] + 20}, 100., game->assetManager.textures[ASSET_IMAGE_TREE]);
-			nodeAddChild(game->root, &nodes[nodesCount-1]);
+			Node* node = getFreeNode();
+			node->data = treeCreate((float[]){i * padding[0] - 50., j * padding[1] - 50.}, 100., game->assetManager.textures[ASSET_IMAGE_TREE]);
+			nodeAddChild(game->root, node);
 		}
 
 	{
-		nodes[nodesCount++] = chopterCreate((float[]){0, 0}, 100., game->assetManager.textures[ASSET_IMAGE_CHOPTER_SPRITESHEET]);
-		nodeAddChild(game->root, &nodes[nodesCount-1]);
+		Node* node = getFreeNode();
+		node->data = chopterCreate((float[]){0, 0}, 100., game->assetManager.textures[ASSET_IMAGE_CHOPTER_SPRITESHEET]);
+		nodeAddChild(game->root, node);
 	}
 	{
-		FrameCounter* fc = frameCounterCreate(game->assetManager.fonts[ASSET_FONT_CHARRIOT]);
-		nodeAddChild(game->root, (Node*)fc);
+		Node *node = getFreeNode();
+		node->data = frameCounterCreate(game->assetManager.fonts[ASSET_FONT_CHARRIOT]);
+		nodeAddChild(game->root, node);
 	}
 }
 
-int compareGameObjectForZSorting(GameObject* a, GameObject* b)
+void swapData(Node* a, Node* b) {
+    void *temp = a->data;
+    a->data = b->data;
+    b->data = temp;
+}
+
+// Comparator function to compare two nodes
+typedef int (*Comparator)(const void*, const void*);
+
+// Function to sort the linked list using a comparator function pointer
+void sortLinkedList(Node* head, Comparator compare) {
+    if (head == NULL || head->next == NULL)
+        return;
+
+    int swapped;
+    Node* ptr1;
+    Node* lptr = NULL;
+
+    do {
+        swapped = 0;
+        ptr1 = head;
+
+        while (ptr1->next != NULL) {
+			Node* nn = ptr1->next;
+            if (compare(ptr1->data, nn->data) > 0) {
+                swapData(ptr1, ptr1->next);
+                swapped = 1;
+            }
+            ptr1 = ptr1->next;
+        }
+        lptr = ptr1;
+    } while (swapped);
+}
+
+int compareGo(GameObject* a, GameObject* b)
 {
-	int returnValue = (a->rigidBody.position[1] + 10) - (b->rigidBody.position[1] + 10);
-	return returnValue;
+	return (a->rigidBody.position[1] - a->sprite.center[1]) - (b->rigidBody.position[1] - b->sprite.center[1]);
 }
 
 void gameRender(Game game)
 {
-	// TODO: THIS SORT WORKS AWFUL;
-	// sortLinkedList(&game.root->children, compareGameObjectForZSorting);
+	sortLinkedList(game.root->children, compareGo);
 
 	SDL_SetRenderDrawColor(game.renderer, 21, 21, 21, 255);
 	SDL_RenderClear(game.renderer);
