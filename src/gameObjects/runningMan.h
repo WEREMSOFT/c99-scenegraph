@@ -53,5 +53,7 @@ RunningMan* runningManCreate(float position[2], float speed, SDL_Texture* textur
 	runningMan->sprite.animation.startTime = SDL_GetTicks();
 	runningMan->sprite.animation.frameCount = 6;
 	runningMan->sprite.animation.framesPerSecond = 10;
+	runningMan->sprite.animation.startFrame = 7;
+
 	return runningMan;
 }

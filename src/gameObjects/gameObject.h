@@ -14,6 +14,7 @@ typedef struct
 	int frameCount;
 	int currentFrame;
 	int startTime;
+	int startFrame;
 } Animation;
 
 typedef struct 
@@ -62,7 +63,7 @@ SDL_Rect processAnimationFrame(GameObject* _this)
 {
 	Sprite* sprite = &_this->sprite;
 	Animation* animation = &sprite->animation;
-	animation->currentFrame = ((SDL_GetTicks() - animation->startTime) * animation->framesPerSecond / 1000) % animation->frameCount;
+	animation->currentFrame = animation->startFrame + ((SDL_GetTicks() - animation->startTime) * animation->framesPerSecond / 1000) % animation->frameCount;
 	sprite->srcRect.x = animation->currentFrame * sprite->srcRect.w;
 }
 
