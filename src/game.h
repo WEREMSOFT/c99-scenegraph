@@ -78,9 +78,9 @@ void gameInit(Game *game)
 	nodes[nodesCount++].data = gameObjectCreate();
 	game->root = &nodes[nodesCount-1];
 
-	int padding[2] = { game->screenSize[0] / 100, game->screenSize[1] / 100};
-	for(int i = 0; i < 110; i++)
-		for(int j = 0; j < 110; j++)
+	int padding[2] = { game->screenSize[0] / 10, game->screenSize[1] / 10};
+	for(int i = 0; i < 11; i++)
+		for(int j = 0; j < 11; j++)
 		{
 			Node* node = getFreeNode();
 			node->data = treeCreate((float[]){i * padding[0] - 50., j * padding[1] - 50.}, 100., game->assetManager.textures[ASSET_IMAGE_TREE]);
@@ -89,7 +89,7 @@ void gameInit(Game *game)
 
 	{
 		Node* node = getFreeNode();
-		node->data = runningManCreate((float[]){0, 0}, 100., game->assetManager.textures[ASSET_IMAGE_RUNNING_MAN]);
+		node->data = runningManCreate((float[]){0, 0}, game->assetManager.textures[ASSET_IMAGE_RUNNING_MAN]);
 		nodeAddChild(game->root, node);
 	}
 	{

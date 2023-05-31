@@ -6,9 +6,6 @@
 typedef struct 
 {
 	GameObject parent;
-	float phase;
-	float radialSpeed;
-	float radious;
 } Tree;
 
 void treeDraw(Tree* _this, SDL_Renderer* renderer)
@@ -20,20 +17,13 @@ void treeDraw(Tree* _this, SDL_Renderer* renderer)
 
 void treeUpdate(Tree* _this, Game* game)
 {
-	_this->phase += game->deltaTime * _this->radialSpeed;
-	_this->parent.rigidBody.position[0] = sinf(_this->phase) * _this->radious + _this->parent.rigidBody.initialPosition[0];
-	_this->parent.rigidBody.position[1] = cosf(_this->phase) * _this->radious + _this->parent.rigidBody.initialPosition[1];
 }
 
 Tree* treeCreate(float position[2], float speed, SDL_Texture* texture)
 {
 	Tree* tree = (Tree*)malloc(sizeof(Tree));
-	tree->parent.rigidBody.initialPosition[0] = position[0];
-	tree->parent.rigidBody.initialPosition[1] = position[1];
-	
-	tree->phase = sinf(position[0]/100.) + cosf(position[1]/100.);
-	tree->radious = 20.;
-	tree->radialSpeed = 10.;
+	tree->parent.rigidBody.position[0] = position[0];
+	tree->parent.rigidBody.position[1] = position[1];
 
 	tree->parent.update = (UpdateFunction)treeUpdate;
 	tree->parent.draw = (DrawFunction)treeDraw;
