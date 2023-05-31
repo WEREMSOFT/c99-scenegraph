@@ -10,6 +10,7 @@ typedef enum
 {	
 	ASSET_IMAGE_TREE,
 	ASSET_IMAGE_CHOPTER_SPRITESHEET,
+	ASSET_IMAGE_RUNNING_MAN,
 	ASSET_IMAGE_COUNT
 } AssetImageEnum;
 
@@ -48,6 +49,7 @@ AssetManager assetManagerInit(SDL_Renderer* renderer)
 	
 	loadTexture(&assetManager,  renderer, ASSET_IMAGE_TREE, "assets/tree.png");
 	loadTexture(&assetManager,  renderer, ASSET_IMAGE_CHOPTER_SPRITESHEET, "assets/chopper-spritesheet.png");
+	loadTexture(&assetManager,  renderer, ASSET_IMAGE_RUNNING_MAN, "assets/running-man.png");
 	loadFont(&assetManager, ASSET_FONT_CHARRIOT, "assets/fonts/charriot.ttf", 12);
 
 	return assetManager;

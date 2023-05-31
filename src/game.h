@@ -12,7 +12,7 @@
 #include "core.h"
 #include "gameObjects/gameObject.h"
 #include "gameObjects/tree.h"
-#include "gameObjects/chopter.h"
+#include "gameObjects/runningMan.h"
 #include "gameObjects/frameCounter.h"
 #include "game_t.h"
 
@@ -89,7 +89,7 @@ void gameInit(Game *game)
 
 	{
 		Node* node = getFreeNode();
-		node->data = chopterCreate((float[]){0, 0}, 100., game->assetManager.textures[ASSET_IMAGE_CHOPTER_SPRITESHEET]);
+		node->data = runningManCreate((float[]){0, 0}, 100., game->assetManager.textures[ASSET_IMAGE_RUNNING_MAN]);
 		nodeAddChild(game->root, node);
 	}
 	{

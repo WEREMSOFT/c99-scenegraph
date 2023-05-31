@@ -24,6 +24,7 @@ typedef struct
 	Animation animation;
 	int center[2];
 	bool isAnimated;
+	bool isFlipped;
 } Sprite;
 
 typedef struct 

@@ -38,7 +38,7 @@ Tree* treeCreate(float position[2], float speed, SDL_Texture* texture)
 	tree->parent.update = (UpdateFunction)treeUpdate;
 	tree->parent.draw = (DrawFunction)treeDraw;
 	tree->parent.rigidBody.speed = speed;
-	tree->parent.sprite.center[1] = 15;
+	tree->parent.sprite.center[1] = 40;
 	tree->parent.sprite.texture = texture;
 	return tree;
 }
