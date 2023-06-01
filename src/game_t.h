@@ -15,6 +15,7 @@ typedef struct Game
 	AssetManager assetManager;
 	bool keys[256];
 	bool isRunning;
+	bool isDebugMode;
 	float deltaTime;
 	int screenSize[2];
 } Game;

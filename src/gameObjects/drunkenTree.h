@@ -11,11 +11,11 @@ typedef struct
 	float radious;
 } DrunkenTree;
 
-void drunkenTreeDraw(DrunkenTree* _this, SDL_Renderer* renderer)
+void drunkenTreeDraw(DrunkenTree* _this, Game* game)
 {
 	int x = (int)_this->parent.rigidBody.position[0];
 	int y = (int)_this->parent.rigidBody.position[1];
-	SDL_RenderCopyEx(renderer, _this->parent.sprite.texture, &((SDL_Rect){0, 0, 16, 32}), &((SDL_Rect){x, y, 16, 32}), 0, NULL, SDL_FLIP_NONE);
+	SDL_RenderCopyEx(game->renderer, _this->parent.sprite.texture, &((SDL_Rect){0, 0, 16, 32}), &((SDL_Rect){x, y, 16, 32}), 0, NULL, SDL_FLIP_NONE);
 }
 
 void drunkenTreeUpdate(DrunkenTree* _this, Game* game)

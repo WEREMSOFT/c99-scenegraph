@@ -6,7 +6,7 @@
 #include <stddef.h>
 
 typedef void(*UpdateFunction)(const void*, Game*);
-typedef void(*DrawFunction)(const void*, const SDL_Renderer*);
+typedef void(*DrawFunction)(const void*, Game*);
 
 typedef struct
 {

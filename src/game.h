@@ -38,7 +38,7 @@ void renderComponentCallback(Node* node, Game* game)
 {
 	GameObject* gameObject = (GameObject*)node->data;
 	if(gameObject != NULL && gameObject->draw != NULL)
-		gameObject->draw(gameObject, game->renderer);
+		gameObject->draw(gameObject, game);
 }
 
 Game gameCreate()
@@ -65,13 +65,14 @@ Game gameCreate()
 	assert(game.window != NULL && "Error creating SDL window");
 
  	game.renderer = SDL_CreateRenderer(game.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
 	assert(game.renderer != NULL && "Error creating renderer");
 
 	game.assetManager = assetManagerInit(game.renderer);
 
 	return game;
 }
+
+RunningMan* hero;
 
 void gameInit(Game *game)
 {
@@ -90,6 +91,7 @@ void gameInit(Game *game)
 	{
 		Node* node = getFreeNode();
 		node->data = runningManCreate((float[]){0, 0}, game->assetManager.textures[ASSET_IMAGE_RUNNING_MAN]);
+		hero = node->data;
 		nodeAddChild(game->root, node);
 	}
 	{
@@ -138,6 +140,8 @@ int compareGo(GameObject* a, GameObject* b)
 	return (a->rigidBody.position[1] - a->sprite.center[1]) - (b->rigidBody.position[1] - b->sprite.center[1]);
 }
 
+SDL_Rect testRect = {100, 100, 100, 100};
+
 void gameRender(Game game)
 {
 	sortLinkedList(game.root->children, compareGo);
@@ -145,7 +149,68 @@ void gameRender(Game game)
 	SDL_SetRenderDrawColor(game.renderer, 21, 21, 21, 255);
 	SDL_RenderClear(game.renderer);
 	traverseGraph(game.root, &game, renderComponentCallback);
+
+	SDL_SetRenderDrawColor(game.renderer, 255, 0, 0, 255);
+	SDL_RenderDrawRect(game.renderer, &testRect);
+
 	SDL_RenderPresent(game.renderer);
+}
+
+
+int checkAABBCollision(SDL_Rect* rect1, SDL_Rect* rect2, int fixRect1) {
+    int collision = 0;
+
+    if (SDL_HasIntersection(rect1, rect2)) {
+        collision = 1;
+
+        if (!fixRect1) {
+            // Adjust rect1 to resolve collision
+            if (rect1->x + rect1->w > rect2->x && rect1->x < rect2->x + rect2->w) {
+                if (rect1->y + rect1->h > rect2->y && rect1->y < rect2->y + rect2->h) {
+                    int dx = (rect1->x + rect1->w / 2) - (rect2->x + rect2->w / 2);
+                    int dy = (rect1->y + rect1->h / 2) - (rect2->y + rect2->h / 2);
+
+                    if (abs(dx) > abs(dy)) {
+                        if (dx > 0) {
+                            rect1->x = rect2->x + rect2->w;
+                        } else {
+                            rect1->x = rect2->x - rect1->w;
+                        }
+                    } else {
+                        if (dy > 0) {
+                            rect1->y = rect2->y + rect2->h;
+                        } else {
+                            rect1->y = rect2->y - rect1->h;
+                        }
+                    }
+                }
+            }
+        } else {
+            // Adjust rect2 to resolve collision
+            if (rect2->x + rect2->w > rect1->x && rect2->x < rect1->x + rect1->w) {
+                if (rect2->y + rect2->h > rect1->y && rect2->y < rect1->y + rect1->h) {
+                    int dx = (rect2->x + rect2->w / 2) - (rect1->x + rect1->w / 2);
+                    int dy = (rect2->y + rect2->h / 2) - (rect1->y + rect1->h / 2);
+
+                    if (abs(dx) > abs(dy)) {
+                        if (dx > 0) {
+                            rect2->x = rect1->x + rect1->w;
+                        } else {
+                            rect2->x = rect1->x - rect2->w;
+                        }
+                    } else {
+                        if (dy > 0) {
+                            rect2->y = rect1->y + rect1->h;
+                        } else {
+                            rect2->y = rect1->y - rect2->h;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return collision;
 }
 
 void gameRun(Game* game)
@@ -170,14 +235,32 @@ void gameRun(Game* game)
 						game->isRunning = false;
 						break;
 					}
+					
 					game->keys[event.key.keysym.scancode] = true;
 					break;
 				case SDL_KEYUP:
 					game->keys[event.key.keysym.scancode] = false;
+					if(event.key.keysym.sym == SDLK_1)
+					{
+						game->isDebugMode = !game->isDebugMode;
+						break;
+					}
 					break;
 			}
 		}
 		traverseGraph(game->root, game, (TraverseNodeCallback)updateComponentCallback);
+
+		SDL_Rect heroRect = hero->parent.sprite.destRect;
+
+		heroRect.x = hero->parent.rigidBody.position[0];
+		heroRect.y = hero->parent.rigidBody.position[1];
+				
+
+		checkAABBCollision(&testRect, &heroRect, 1);
+		
+		hero->parent.rigidBody.position[0] = heroRect.x;
+		hero->parent.rigidBody.position[1] = heroRect.y;
+		
 		gameRender(*game);
 	}
 }

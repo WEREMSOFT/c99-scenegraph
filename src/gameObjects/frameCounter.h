@@ -16,7 +16,7 @@ void frameCounterUpdate(FrameCounter* _this, Game* game)
 	
 }
 
-void frameCounterDraw(FrameCounter* _this, SDL_Renderer* renderer)
+void frameCounterDraw(FrameCounter* _this, Game* game)
 {
 	Uint32 currentTime = SDL_GetTicks();
 	Uint32 elapsedTime = currentTime - _this->startTime;
@@ -25,9 +25,9 @@ void frameCounterDraw(FrameCounter* _this, SDL_Renderer* renderer)
 		char fpsText[16];
 		snprintf(fpsText, sizeof(fpsText), "FPS: %.2f", fps);
 		SDL_Surface* textSurface = TTF_RenderText_Blended(_this->font, fpsText, _this->textColor);
-		SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+		SDL_Texture* textTexture = SDL_CreateTextureFromSurface(game->renderer, textSurface);
 		SDL_Rect textRect = {_this->parent.rigidBody.position[0], _this->parent.rigidBody.position[1], textSurface->w, textSurface->h}; // position of the FPS text
-		SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+		SDL_RenderCopy(game->renderer, textTexture, NULL, &textRect);
 		SDL_FreeSurface(textSurface);
 		SDL_DestroyTexture(textTexture);
 	if (elapsedTime >= 1000) {

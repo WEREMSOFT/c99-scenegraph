@@ -17,11 +17,18 @@ typedef struct {
 
 
 
-void runningManDraw(RunningMan* _this, SDL_Renderer* renderer)
+void runningManDraw(RunningMan* _this, Game* game)
 {
 	_this->parent.sprite.destRect.x = (int)_this->parent.rigidBody.position[0];
 	_this->parent.sprite.destRect.y = (int)_this->parent.rigidBody.position[1];
-	SDL_RenderCopyEx(renderer, _this->parent.sprite.texture, &_this->parent.sprite.srcRect, &_this->parent.sprite.destRect, 0, NULL, _this->parent.sprite.isFlipped?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
+	SDL_RenderCopyEx(game->renderer, _this->parent.sprite.texture, &_this->parent.sprite.srcRect, &_this->parent.sprite.destRect, 0, NULL, _this->parent.sprite.isFlipped?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
+
+	if(game->isDebugMode)
+	{
+		SDL_SetRenderDrawColor(game->renderer, 255, 0, 0, 255);
+		SDL_RenderDrawRect(game->renderer, &_this->parent.sprite.destRect);
+	}
+
 }
 
 void setAnimationWalk(RunningMan* _this)

@@ -5,11 +5,11 @@
 
 typedef GameObject Chopter;
 
-void chopterDraw(Chopter* _this, SDL_Renderer* renderer)
+void chopterDraw(Chopter* _this, Game* game)
 {
 	_this->sprite.destRect.x = (int)_this->rigidBody.position[0];
 	_this->sprite.destRect.y = (int)_this->rigidBody.position[1];
-	SDL_RenderCopyEx(renderer, _this->sprite.texture, &_this->sprite.srcRect, &_this->sprite.destRect, 0, NULL, SDL_FLIP_NONE);
+	SDL_RenderCopyEx(game->renderer, _this->sprite.texture, &_this->sprite.srcRect, &_this->sprite.destRect, 0, NULL, SDL_FLIP_NONE);
 }
 
 void chopterUpdate(Chopter* _this, Game* game)
