@@ -7,12 +7,14 @@ typedef enum
 {
 	RUNNING_MAN_ANIMATION_RUN,
 	RUNNING_MAN_ANIMATION_WALK,
+	RUNNING_MAN_ANIMATION_IDLE,
 	RUNING_MAN_ANIMATION_COUNT
 } RunningManAnimations;
 
 typedef struct {
 	GameObject parent;
 	int framesPerAnimation[RUNING_MAN_ANIMATION_COUNT];
+	int framesPerSecond[RUNING_MAN_ANIMATION_COUNT];
 } RunningMan;
 
 
@@ -31,24 +33,35 @@ void runningManDraw(RunningMan* _this, Game* game)
 
 }
 
+void setAnimationIdle(RunningMan* _this)
+{
+	_this->parent.sprite.animation.currentAnimation = RUNNING_MAN_ANIMATION_IDLE;
+	_this->parent.sprite.animation.frameCount = _this->framesPerAnimation[RUNNING_MAN_ANIMATION_IDLE];
+	_this->parent.sprite.animation.framesPerSecond = _this->framesPerSecond[RUNNING_MAN_ANIMATION_IDLE];
+}
+
 void setAnimationWalk(RunningMan* _this)
 {
 	_this->parent.sprite.animation.currentAnimation = RUNNING_MAN_ANIMATION_WALK;
 	_this->parent.sprite.animation.frameCount = _this->framesPerAnimation[RUNNING_MAN_ANIMATION_WALK];
+	_this->parent.sprite.animation.framesPerSecond = _this->framesPerSecond[RUNNING_MAN_ANIMATION_WALK];
 }
 
 void setAnimationRun(RunningMan* _this)
 {
 	_this->parent.sprite.animation.currentAnimation = RUNNING_MAN_ANIMATION_RUN;
 	_this->parent.sprite.animation.frameCount = _this->framesPerAnimation[RUNNING_MAN_ANIMATION_RUN];
+	_this->parent.sprite.animation.framesPerSecond = _this->framesPerSecond[RUNNING_MAN_ANIMATION_RUN];
 }
 
 void runningManUpdate(RunningMan* _this, Game* game)
 {
 	processAnimationFrame(_this);
 
-	static float runningSpeed = 180.;
+	static float runningSpeed = 250.;
 	static float walkingSpeed = 100.;
+
+	bool isMoving = false;
 
 	if(game->keys[SDL_SCANCODE_SPACE])
 	{
@@ -64,19 +77,28 @@ void runningManUpdate(RunningMan* _this, Game* game)
 	{
 		_this->parent.rigidBody.position[0] -= _this->parent.rigidBody.speed * game->deltaTime;
 		_this->parent.sprite.isFlipped = true;
+		isMoving = true;
 	}
 	if(game->keys[SDL_SCANCODE_RIGHT])
 	{
 		_this->parent.rigidBody.position[0] += _this->parent.rigidBody.speed * game->deltaTime;
 		_this->parent.sprite.isFlipped = false;
+		isMoving = true;
 	}
 	if(game->keys[SDL_SCANCODE_UP])
 	{
 		_this->parent.rigidBody.position[1] -= _this->parent.rigidBody.speed * game->deltaTime;
+		isMoving = true;
 	}
 	if(game->keys[SDL_SCANCODE_DOWN])
 	{
 		_this->parent.rigidBody.position[1] += _this->parent.rigidBody.speed * game->deltaTime;
+		isMoving = true;
+	}
+
+	if(!isMoving)
+	{
+		setAnimationIdle(_this);
 	}
 }
 
@@ -99,6 +121,13 @@ RunningMan* runningManCreate(float position[2], SDL_Texture* texture)
 
 	runningMan->framesPerAnimation[RUNNING_MAN_ANIMATION_WALK] = 8;
 	runningMan->framesPerAnimation[RUNNING_MAN_ANIMATION_RUN] = 6;
+	runningMan->framesPerAnimation[RUNNING_MAN_ANIMATION_IDLE] = 8;
+
+	runningMan->framesPerSecond[RUNNING_MAN_ANIMATION_WALK] = 10;
+	runningMan->framesPerSecond[RUNNING_MAN_ANIMATION_RUN] = 10;
+	runningMan->framesPerSecond[RUNNING_MAN_ANIMATION_IDLE] = 5;
+
+	runningMan->parent.sprite.animation.framesPerSecond = 10;
 
 	runningMan->parent.sprite.center[1] = 10;
 

@@ -256,10 +256,12 @@ void gameRun(Game* game)
 		heroRect.y = hero->parent.rigidBody.position[1];
 				
 
-		checkAABBCollision(&testRect, &heroRect, 1);
+		if(checkAABBCollision(&testRect, &heroRect, 1))
+		{
+			hero->parent.rigidBody.position[0] = heroRect.x;
+			hero->parent.rigidBody.position[1] = heroRect.y;
+		}
 		
-		hero->parent.rigidBody.position[0] = heroRect.x;
-		hero->parent.rigidBody.position[1] = heroRect.y;
 		
 		gameRender(*game);
 	}
