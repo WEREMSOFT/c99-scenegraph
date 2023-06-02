@@ -153,6 +153,30 @@ void gameRender(Game game)
 	SDL_SetRenderDrawColor(game.renderer, 255, 0, 0, 255);
 	SDL_RenderDrawRect(game.renderer, &testRect);
 
+	SDL_Rect heroRect = hero->parent.sprite.destRect;
+	heroRect.x = hero->parent.rigidBody.position[0];
+	heroRect.y = hero->parent.rigidBody.position[1];
+
+	SDL_Rect result;
+
+	if(SDL_IntersectFRect(&testRect, &heroRect, &result))
+	{
+		SDL_RenderFillRect(game.renderer, &result);
+		if(result.w < result.h)
+		{
+			if(result.x < hero->parent.rigidBody.position[0])
+				hero->parent.rigidBody.position[0] += result.w;
+			else
+				hero->parent.rigidBody.position[0] -= result.w;
+		} else 
+		{
+			if(result.y < hero->parent.rigidBody.position[1])
+				hero->parent.rigidBody.position[1] += result.h;
+			else
+				hero->parent.rigidBody.position[1] -= result.h;
+		}
+	}
+
 	SDL_RenderPresent(game.renderer);
 }
 
@@ -254,15 +278,7 @@ void gameRun(Game* game)
 
 		heroRect.x = hero->parent.rigidBody.position[0];
 		heroRect.y = hero->parent.rigidBody.position[1];
-				
-
-		if(checkAABBCollision(&testRect, &heroRect, 1))
-		{
-			hero->parent.rigidBody.position[0] = heroRect.x;
-			hero->parent.rigidBody.position[1] = heroRect.y;
-		}
-		
-		
+						
 		gameRender(*game);
 	}
 }
