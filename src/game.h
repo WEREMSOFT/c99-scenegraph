@@ -12,6 +12,7 @@
 #include "core.h"
 #include "gameObjects/gameObject.h"
 #include "gameObjects/tree.h"
+#include "gameObjects/stoneBlock.h"
 #include "gameObjects/runningMan.h"
 #include "gameObjects/frameCounter.h"
 #include "game_t.h"
@@ -79,15 +80,6 @@ void gameInit(Game *game)
 	nodes[nodesCount++].data = gameObjectCreate();
 	game->root = &nodes[nodesCount-1];
 
-	int padding[2] = { game->screenSize[0] / 10, game->screenSize[1] / 10};
-	for(int i = 0; i < 11; i++)
-		for(int j = 0; j < 11; j++)
-		{
-			Node* node = getFreeNode();
-			node->data = treeCreate((float[]){i * padding[0] - 50., j * padding[1] - 50.}, 100., game->assetManager.textures[ASSET_IMAGE_TREE]);
-			nodeAddChild(game->root, node);
-		}
-
 	{
 		Node* node = getFreeNode();
 		node->data = runningManCreate((float[]){0, 0}, game->assetManager.textures[ASSET_IMAGE_RUNNING_MAN]);
@@ -99,6 +91,14 @@ void gameInit(Game *game)
 		node->data = frameCounterCreate(game->assetManager.fonts[ASSET_FONT_CHARRIOT]);
 		nodeAddChild(game->root, node);
 	}
+	for(int i = 0; i < game->screenSize[0] / 32; i++)
+		for(int j = 0; j < game->screenSize[0] / 46; j++)
+		{
+			if((i != 0 && j != 0) && (i != 24 && j != 12)) continue;
+			Node* node = getFreeNode();
+			node->data = stoneBlockCreate((float[]){i * 32, j * 46}, game->assetManager.textures[ASSET_IMAGE_PLACEHOLDER_CUBE]);
+			nodeAddChild(game->root, node);
+		}
 }
 
 void swapData(Node* a, Node* b) {
@@ -142,6 +142,17 @@ int compareGo(GameObject* a, GameObject* b)
 
 SDL_Rect testRect = {100, 100, 100, 100};
 
+SDL_FRect rectToRectf(SDL_Rect rectI)
+{
+	SDL_FRect rect = {0};
+	rect.x = (float)rectI.x;
+	rect.y = (float)rectI.y;
+	rect.w = (float)rectI.w;
+	rect.h = (float)rectI.h;
+
+	return rect;
+}
+
 void gameRender(Game game)
 {
 	sortLinkedList(game.root->children, compareGo);
@@ -152,89 +163,8 @@ void gameRender(Game game)
 
 	SDL_SetRenderDrawColor(game.renderer, 255, 0, 0, 255);
 	SDL_RenderDrawRect(game.renderer, &testRect);
-
-	SDL_Rect heroRect = hero->parent.sprite.destRect;
-	heroRect.x = hero->parent.rigidBody.position[0];
-	heroRect.y = hero->parent.rigidBody.position[1];
-
-	SDL_Rect result;
-
-	if(SDL_IntersectFRect(&testRect, &heroRect, &result))
-	{
-		SDL_RenderFillRect(game.renderer, &result);
-		if(result.w < result.h)
-		{
-			if(result.x < hero->parent.rigidBody.position[0])
-				hero->parent.rigidBody.position[0] += result.w;
-			else
-				hero->parent.rigidBody.position[0] -= result.w;
-		} else 
-		{
-			if(result.y < hero->parent.rigidBody.position[1])
-				hero->parent.rigidBody.position[1] += result.h;
-			else
-				hero->parent.rigidBody.position[1] -= result.h;
-		}
-	}
-
+	
 	SDL_RenderPresent(game.renderer);
-}
-
-
-int checkAABBCollision(SDL_Rect* rect1, SDL_Rect* rect2, int fixRect1) {
-    int collision = 0;
-
-    if (SDL_HasIntersection(rect1, rect2)) {
-        collision = 1;
-
-        if (!fixRect1) {
-            // Adjust rect1 to resolve collision
-            if (rect1->x + rect1->w > rect2->x && rect1->x < rect2->x + rect2->w) {
-                if (rect1->y + rect1->h > rect2->y && rect1->y < rect2->y + rect2->h) {
-                    int dx = (rect1->x + rect1->w / 2) - (rect2->x + rect2->w / 2);
-                    int dy = (rect1->y + rect1->h / 2) - (rect2->y + rect2->h / 2);
-
-                    if (abs(dx) > abs(dy)) {
-                        if (dx > 0) {
-                            rect1->x = rect2->x + rect2->w;
-                        } else {
-                            rect1->x = rect2->x - rect1->w;
-                        }
-                    } else {
-                        if (dy > 0) {
-                            rect1->y = rect2->y + rect2->h;
-                        } else {
-                            rect1->y = rect2->y - rect1->h;
-                        }
-                    }
-                }
-            }
-        } else {
-            // Adjust rect2 to resolve collision
-            if (rect2->x + rect2->w > rect1->x && rect2->x < rect1->x + rect1->w) {
-                if (rect2->y + rect2->h > rect1->y && rect2->y < rect1->y + rect1->h) {
-                    int dx = (rect2->x + rect2->w / 2) - (rect1->x + rect1->w / 2);
-                    int dy = (rect2->y + rect2->h / 2) - (rect1->y + rect1->h / 2);
-
-                    if (abs(dx) > abs(dy)) {
-                        if (dx > 0) {
-                            rect2->x = rect1->x + rect1->w;
-                        } else {
-                            rect2->x = rect1->x - rect2->w;
-                        }
-                    } else {
-                        if (dy > 0) {
-                            rect2->y = rect1->y + rect1->h;
-                        } else {
-                            rect2->y = rect1->y - rect2->h;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return collision;
 }
 
 void gameRun(Game* game)
@@ -274,11 +204,34 @@ void gameRun(Game* game)
 		}
 		traverseGraph(game->root, game, (TraverseNodeCallback)updateComponentCallback);
 
-		SDL_Rect heroRect = hero->parent.sprite.destRect;
+		{
+			SDL_Rect heroRect = hero->parent.sprite.destRect;
+			heroRect.x = hero->parent.rigidBody.position[0];
+			heroRect.y = hero->parent.rigidBody.position[1];
 
-		heroRect.x = hero->parent.rigidBody.position[0];
-		heroRect.y = hero->parent.rigidBody.position[1];
-						
+			SDL_FRect result;
+			SDL_FRect a = rectToRectf(testRect);
+			SDL_FRect b = rectToRectf(heroRect);
+
+			if(SDL_IntersectFRect(&a, &b, &result))
+			{
+				if(result.w < result.h)
+				{
+					if(result.x < hero->parent.rigidBody.position[0])
+						hero->parent.rigidBody.position[0] += result.w;
+					else
+						hero->parent.rigidBody.position[0] -= result.w;
+				} else 
+				{
+					if(result.y < hero->parent.rigidBody.position[1])
+						hero->parent.rigidBody.position[1] += result.h;
+					else
+						hero->parent.rigidBody.position[1] -= result.h;
+				}
+			}
+		}
+
+
 		gameRender(*game);
 	}
 }
