@@ -30,7 +30,6 @@ typedef struct
 
 typedef struct 
 {
-	float position[2];
 	float initialPosition[2];
 	SDL_FRect boundingBox;
 	float speed;

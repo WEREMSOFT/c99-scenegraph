@@ -26,7 +26,7 @@ void frameCounterDraw(FrameCounter* _this, Game* game)
 		snprintf(fpsText, sizeof(fpsText), "FPS: %.2f", fps);
 		SDL_Surface* textSurface = TTF_RenderText_Blended(_this->font, fpsText, _this->textColor);
 		SDL_Texture* textTexture = SDL_CreateTextureFromSurface(game->renderer, textSurface);
-		SDL_Rect textRect = {_this->parent.rigidBody.position[0], _this->parent.rigidBody.position[1], textSurface->w, textSurface->h}; // position of the FPS text
+		SDL_Rect textRect = {_this->parent.rigidBody.boundingBox.x, _this->parent.rigidBody.boundingBox.y, textSurface->w, textSurface->h}; // position of the FPS text
 		SDL_RenderCopy(game->renderer, textTexture, NULL, &textRect);
 		SDL_FreeSurface(textSurface);
 		SDL_DestroyTexture(textTexture);

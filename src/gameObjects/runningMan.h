@@ -21,14 +21,14 @@ typedef struct {
 
 void runningManDraw(RunningMan* _this, Game* game)
 {
-	_this->parent.sprite.destRect.x = (int)_this->parent.rigidBody.position[0];
-	_this->parent.sprite.destRect.y = (int)_this->parent.rigidBody.position[1];
+	_this->parent.sprite.destRect.x = (int)_this->parent.rigidBody.boundingBox.x;
+	_this->parent.sprite.destRect.y = (int)_this->parent.rigidBody.boundingBox.y;
 	SDL_RenderCopyEx(game->renderer, _this->parent.sprite.texture, &_this->parent.sprite.srcRect, &_this->parent.sprite.destRect, 0, NULL, _this->parent.sprite.isFlipped?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
 
 	if(game->isDebugMode)
 	{
 		SDL_SetRenderDrawColor(game->renderer, 255, 0, 0, 255);
-		SDL_RenderDrawRect(game->renderer, &_this->parent.sprite.destRect);
+		SDL_RenderDrawRectF(game->renderer, &_this->parent.rigidBody.boundingBox);
 	}
 
 }
@@ -75,24 +75,24 @@ void runningManUpdate(RunningMan* _this, Game* game)
 
 	if(game->keys[SDL_SCANCODE_LEFT])
 	{
-		_this->parent.rigidBody.position[0] -= _this->parent.rigidBody.speed * game->deltaTime;
+		_this->parent.rigidBody.boundingBox.x -= _this->parent.rigidBody.speed * game->deltaTime;
 		_this->parent.sprite.isFlipped = true;
 		isMoving = true;
 	}
 	if(game->keys[SDL_SCANCODE_RIGHT])
 	{
-		_this->parent.rigidBody.position[0] += _this->parent.rigidBody.speed * game->deltaTime;
+		_this->parent.rigidBody.boundingBox.x += _this->parent.rigidBody.speed * game->deltaTime;
 		_this->parent.sprite.isFlipped = false;
 		isMoving = true;
 	}
 	if(game->keys[SDL_SCANCODE_UP])
 	{
-		_this->parent.rigidBody.position[1] -= _this->parent.rigidBody.speed * game->deltaTime;
+		_this->parent.rigidBody.boundingBox.y -= _this->parent.rigidBody.speed * game->deltaTime;
 		isMoving = true;
 	}
 	if(game->keys[SDL_SCANCODE_DOWN])
 	{
-		_this->parent.rigidBody.position[1] += _this->parent.rigidBody.speed * game->deltaTime;
+		_this->parent.rigidBody.boundingBox.y += _this->parent.rigidBody.speed * game->deltaTime;
 		isMoving = true;
 	}
 
@@ -105,8 +105,12 @@ void runningManUpdate(RunningMan* _this, Game* game)
 RunningMan* runningManCreate(float position[2], SDL_Texture* texture)
 {
 	RunningMan* runningMan = (RunningMan*)malloc(sizeof(RunningMan));
-	runningMan->parent.rigidBody.position[0] = position[0];
-	runningMan->parent.rigidBody.position[1] = position[1];
+	
+	runningMan->parent.rigidBody.boundingBox.x = position[0];
+	runningMan->parent.rigidBody.boundingBox.y = position[1];
+	runningMan->parent.rigidBody.boundingBox.w = 25;
+	runningMan->parent.rigidBody.boundingBox.h = 50;
+
 	runningMan->parent.update = (UpdateFunction)runningManUpdate;
 	runningMan->parent.draw = (DrawFunction)runningManDraw;
 	runningMan->parent.rigidBody.speed = 0;

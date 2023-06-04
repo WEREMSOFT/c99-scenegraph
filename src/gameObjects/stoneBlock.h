@@ -10,8 +10,8 @@ typedef struct
 
 void stoneBlockDraw(StoneBlock* _this, Game* game)
 {
-	_this->parent.sprite.destRect.x = (int)_this->parent.rigidBody.position[0];
-	_this->parent.sprite.destRect.y = (int)_this->parent.rigidBody.position[1];
+	_this->parent.sprite.destRect.x = (int)_this->parent.rigidBody.boundingBox.x;
+	_this->parent.sprite.destRect.y = (int)_this->parent.rigidBody.boundingBox.y;
 	SDL_RenderCopyEx(game->renderer, _this->parent.sprite.texture, &_this->parent.sprite.srcRect, &_this->parent.sprite.destRect, 0, NULL, SDL_FLIP_NONE);
 }
 
@@ -22,8 +22,8 @@ void stoneBlockUpdate(StoneBlock* _this, Game* game)
 StoneBlock* stoneBlockCreate(float position[2], SDL_Texture* texture)
 {
 	StoneBlock* stoneBlock = (StoneBlock*)malloc(sizeof(StoneBlock));
-	stoneBlock->parent.rigidBody.position[0] = position[0];
-	stoneBlock->parent.rigidBody.position[1] = position[1];
+	stoneBlock->parent.rigidBody.boundingBox.x = position[0];
+	stoneBlock->parent.rigidBody.boundingBox.y = position[1];
 
 	int size[2];
 

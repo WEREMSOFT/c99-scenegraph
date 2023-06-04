@@ -137,21 +137,10 @@ void sortLinkedList(Node* head, Comparator compare) {
 
 int compareGo(GameObject* a, GameObject* b)
 {
-	return (a->rigidBody.position[1] - a->sprite.center[1]) - (b->rigidBody.position[1] - b->sprite.center[1]);
+	return (a->rigidBody.boundingBox.y - a->sprite.center[1]) - (b->rigidBody.boundingBox.y - b->sprite.center[1]);
 }
 
 SDL_Rect testRect = {100, 100, 100, 100};
-
-SDL_FRect rectToRectf(SDL_Rect rectI)
-{
-	SDL_FRect rect = {0};
-	rect.x = (float)rectI.x;
-	rect.y = (float)rectI.y;
-	rect.w = (float)rectI.w;
-	rect.h = (float)rectI.h;
-
-	return rect;
-}
 
 void gameRender(Game game)
 {
@@ -205,31 +194,55 @@ void gameRun(Game* game)
 		traverseGraph(game->root, game, (TraverseNodeCallback)updateComponentCallback);
 
 		{
-			SDL_Rect heroRect = hero->parent.sprite.destRect;
-			heroRect.x = hero->parent.rigidBody.position[0];
-			heroRect.y = hero->parent.rigidBody.position[1];
 
 			SDL_FRect result;
 			SDL_FRect a = rectToRectf(testRect);
-			SDL_FRect b = rectToRectf(heroRect);
+			SDL_FRect b = hero->parent.rigidBody.boundingBox;
 
 			if(SDL_IntersectFRect(&a, &b, &result))
 			{
 				if(result.w < result.h)
 				{
-					if(result.x < hero->parent.rigidBody.position[0])
-						hero->parent.rigidBody.position[0] += result.w;
+					if(result.x <= hero->parent.rigidBody.boundingBox.x)
+						hero->parent.rigidBody.boundingBox.x += result.w;
 					else
-						hero->parent.rigidBody.position[0] -= result.w;
+						hero->parent.rigidBody.boundingBox.x -= result.w;
 				} else 
 				{
-					if(result.y < hero->parent.rigidBody.position[1])
-						hero->parent.rigidBody.position[1] += result.h;
+					if(result.y <= hero->parent.rigidBody.boundingBox.y)
+						hero->parent.rigidBody.boundingBox.y += result.h;
 					else
-						hero->parent.rigidBody.position[1] -= result.h;
+						hero->parent.rigidBody.boundingBox.y -= result.h;
 				}
 			}
 		}
+
+		// {
+		// 	SDL_Rect heroRect = hero->parent.sprite.destRect;
+		// 	heroRect.x = hero->parent.rigidBody.boundingBox.x;
+		// 	heroRect.y = hero->parent.rigidBody.boundingBox.y;
+
+		// 	SDL_FRect result;
+		// 	SDL_FRect a = rectToRectf(testRect);
+		// 	SDL_FRect b = rectToRectf(heroRect);
+
+		// 	if(SDL_IntersectFRect(&a, &b, &result))
+		// 	{
+		// 		if(result.w < result.h)
+		// 		{
+		// 			if(result.x < hero->parent.rigidBody.boundingBox.x)
+		// 				hero->parent.rigidBody.boundingBox.x += result.w;
+		// 			else
+		// 				hero->parent.rigidBody.boundingBox.x -= result.w;
+		// 		} else 
+		// 		{
+		// 			if(result.y < hero->parent.rigidBody.boundingBox.y)
+		// 				hero->parent.rigidBody.boundingBox.y += result.h;
+		// 			else
+		// 				hero->parent.rigidBody.boundingBox.y -= result.h;
+		// 		}
+		// 	}
+		// }
 
 
 		gameRender(*game);

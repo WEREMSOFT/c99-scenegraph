@@ -69,4 +69,26 @@ void freeNode(Node* node)
 {
 	free(node->data);
 }
+
+SDL_FRect rectToRectf(SDL_Rect rectI)
+{
+	SDL_FRect rect = {0};
+	rect.x = (float)rectI.x;
+	rect.y = (float)rectI.y;
+	rect.w = (float)rectI.w;
+	rect.h = (float)rectI.h;
+
+	return rect;
+}
+
+SDL_Rect rectfToRect(SDL_FRect rectF)
+{
+	SDL_Rect rect = {0};
+	rect.x = (int)rectF.x;
+	rect.y = (int)rectF.y;
+	rect.w = (int)rectF.w;
+	rect.h = (int)rectF.h;
+
+	return rect;
+}
 #endif
