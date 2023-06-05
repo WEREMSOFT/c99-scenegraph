@@ -156,6 +156,28 @@ void gameRender(Game game)
 	SDL_RenderPresent(game.renderer);
 }
 
+void resolveCollision(SDL_FRect *rectA, SDL_FRect *rectB, bool firstIsFixed)
+{
+	SDL_FRect result;
+
+	if(SDL_IntersectFRect(rectA, rectB, &result))
+	{
+		if(result.w < result.h)
+		{
+			if(result.x <= rectB->x)
+				rectB->x += result.w;
+			else
+				rectB->x -= result.w;
+		} else 
+		{
+			if(result.y <= rectB->y)
+				rectB->y += result.h;
+			else
+				rectB->y -= result.h;
+		}
+	}
+}
+
 void gameRun(Game* game)
 {
 	float lastFrameTime = SDL_GetTicks();
@@ -193,29 +215,33 @@ void gameRun(Game* game)
 		}
 		traverseGraph(game->root, game, (TraverseNodeCallback)updateComponentCallback);
 
-		{
+		SDL_FRect a = rectToRectf(testRect);
 
-			SDL_FRect result;
-			SDL_FRect a = rectToRectf(testRect);
-			SDL_FRect b = hero->parent.rigidBody.boundingBox;
+		resolveCollision(&a, &hero->parent.rigidBody.boundingBox, true);
 
-			if(SDL_IntersectFRect(&a, &b, &result))
-			{
-				if(result.w < result.h)
-				{
-					if(result.x <= hero->parent.rigidBody.boundingBox.x)
-						hero->parent.rigidBody.boundingBox.x += result.w;
-					else
-						hero->parent.rigidBody.boundingBox.x -= result.w;
-				} else 
-				{
-					if(result.y <= hero->parent.rigidBody.boundingBox.y)
-						hero->parent.rigidBody.boundingBox.y += result.h;
-					else
-						hero->parent.rigidBody.boundingBox.y -= result.h;
-				}
-			}
-		}
+		// {
+
+		// 	SDL_FRect result;
+		// 	SDL_FRect a = rectToRectf(testRect);
+		// 	SDL_FRect b = hero->parent.rigidBody.boundingBox;
+
+		// 	if(SDL_IntersectFRect(&a, &b, &result))
+		// 	{
+		// 		if(result.w < result.h)
+		// 		{
+		// 			if(result.x <= hero->parent.rigidBody.boundingBox.x)
+		// 				hero->parent.rigidBody.boundingBox.x += result.w;
+		// 			else
+		// 				hero->parent.rigidBody.boundingBox.x -= result.w;
+		// 		} else 
+		// 		{
+		// 			if(result.y <= hero->parent.rigidBody.boundingBox.y)
+		// 				hero->parent.rigidBody.boundingBox.y += result.h;
+		// 			else
+		// 				hero->parent.rigidBody.boundingBox.y -= result.h;
+		// 		}
+		// 	}
+		// }
 
 		// {
 		// 	SDL_Rect heroRect = hero->parent.sprite.destRect;
