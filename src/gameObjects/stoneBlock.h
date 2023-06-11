@@ -10,9 +10,7 @@ typedef struct
 
 void stoneBlockDraw(StoneBlock* _this, Game* game)
 {
-	_this->parent.sprite.destRect.x = (int)_this->parent.rigidBody.boundingBox.x;
-	_this->parent.sprite.destRect.y = (int)_this->parent.rigidBody.boundingBox.y;
-	SDL_RenderCopyEx(game->renderer, _this->parent.sprite.texture, &_this->parent.sprite.srcRect, &_this->parent.sprite.destRect, 0, NULL, SDL_FLIP_NONE);
+	gameObjectDraw(&_this->parent, game);
 }
 
 void stoneBlockUpdate(StoneBlock* _this, Game* game)
@@ -24,6 +22,9 @@ StoneBlock* stoneBlockCreate(float position[2], SDL_Texture* texture)
 	StoneBlock* stoneBlock = (StoneBlock*)malloc(sizeof(StoneBlock));
 	stoneBlock->parent.rigidBody.boundingBox.x = position[0];
 	stoneBlock->parent.rigidBody.boundingBox.y = position[1];
+	
+	stoneBlock->parent.rigidBody.boundingBox.w = 32;
+	stoneBlock->parent.rigidBody.boundingBox.h = 23;
 
 	int size[2];
 
@@ -34,7 +35,14 @@ StoneBlock* stoneBlockCreate(float position[2], SDL_Texture* texture)
 
 	stoneBlock->parent.update = (UpdateFunction)stoneBlockUpdate;
 	stoneBlock->parent.draw = (DrawFunction)stoneBlockDraw;
-	stoneBlock->parent.sprite.center[1] = 20;
+
+	stoneBlock->parent.sprite.center[0] = 0;
+	stoneBlock->parent.sprite.center[1] = 23;
+	stoneBlock->parent.sprite.zIndex = 27;
+
+	stoneBlock->parent.sprite.isFlipped = false;
+	stoneBlock->parent.sprite.isAnimated = false;
+
 	stoneBlock->parent.sprite.texture = texture;
 	return stoneBlock;
 }

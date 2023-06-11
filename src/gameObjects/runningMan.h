@@ -11,7 +11,7 @@ typedef enum
 	RUNING_MAN_ANIMATION_COUNT
 } RunningManAnimations;
 
-typedef struct {
+typedef struct RunningMan {
 	GameObject parent;
 	int framesPerAnimation[RUNING_MAN_ANIMATION_COUNT];
 	int framesPerSecond[RUNING_MAN_ANIMATION_COUNT];
@@ -21,16 +21,7 @@ typedef struct {
 
 void runningManDraw(RunningMan* _this, Game* game)
 {
-	_this->parent.sprite.destRect.x = (int)_this->parent.rigidBody.boundingBox.x;
-	_this->parent.sprite.destRect.y = (int)_this->parent.rigidBody.boundingBox.y;
-	SDL_RenderCopyEx(game->renderer, _this->parent.sprite.texture, &_this->parent.sprite.srcRect, &_this->parent.sprite.destRect, 0, NULL, _this->parent.sprite.isFlipped?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
-
-	if(game->isDebugMode)
-	{
-		SDL_SetRenderDrawColor(game->renderer, 255, 0, 0, 255);
-		SDL_RenderDrawRectF(game->renderer, &_this->parent.rigidBody.boundingBox);
-	}
-
+	gameObjectDraw(&_this->parent, game);
 }
 
 void setAnimationIdle(RunningMan* _this)
@@ -109,7 +100,7 @@ RunningMan* runningManCreate(float position[2], SDL_Texture* texture)
 	runningMan->parent.rigidBody.boundingBox.x = position[0];
 	runningMan->parent.rigidBody.boundingBox.y = position[1];
 	runningMan->parent.rigidBody.boundingBox.w = 25;
-	runningMan->parent.rigidBody.boundingBox.h = 50;
+	runningMan->parent.rigidBody.boundingBox.h = 10;
 
 	runningMan->parent.update = (UpdateFunction)runningManUpdate;
 	runningMan->parent.draw = (DrawFunction)runningManDraw;
@@ -133,7 +124,12 @@ RunningMan* runningManCreate(float position[2], SDL_Texture* texture)
 
 	runningMan->parent.sprite.animation.framesPerSecond = 10;
 
-	runningMan->parent.sprite.center[1] = 10;
+	runningMan->parent.sprite.center[0] = 15;
+	runningMan->parent.sprite.center[1] = 50;
+
+	runningMan->parent.sprite.isFlipped = false;
+
+	runningMan->parent.sprite.zIndex = 50;
 
 	runningMan->parent.sprite.animation.frameCount = runningMan->framesPerAnimation[RUNNING_MAN_ANIMATION_WALK];
 	runningMan->parent.sprite.animation.currentAnimation = RUNNING_MAN_ANIMATION_WALK;

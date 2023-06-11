@@ -73,8 +73,6 @@ Game gameCreate()
 	return game;
 }
 
-RunningMan* hero;
-
 void gameInit(Game *game)
 {
 	nodes[nodesCount++].data = gameObjectCreate();
@@ -82,8 +80,8 @@ void gameInit(Game *game)
 
 	{
 		Node* node = getFreeNode();
-		node->data = runningManCreate((float[]){0, 0}, game->assetManager.textures[ASSET_IMAGE_RUNNING_MAN]);
-		hero = node->data;
+		node->data = runningManCreate((float[]){50, 50}, game->assetManager.textures[ASSET_IMAGE_RUNNING_MAN]);
+		game->hero = node->data;
 		nodeAddChild(game->root, node);
 	}
 	{
@@ -92,12 +90,13 @@ void gameInit(Game *game)
 		nodeAddChild(game->root, node);
 	}
 	for(int i = 0; i < game->screenSize[0] / 32; i++)
-		for(int j = 0; j < game->screenSize[0] / 46; j++)
+		for(int j = 0; j < game->screenSize[0] / 24; j++)
 		{
-			if((i != 0 && j != 0) && (i != 24 && j != 12)) continue;
+			if(((i != 0 && j != 0) && (i != 24 && j != 24) || j > 24)) continue;
 			Node* node = getFreeNode();
-			node->data = stoneBlockCreate((float[]){i * 32, j * 46}, game->assetManager.textures[ASSET_IMAGE_PLACEHOLDER_CUBE]);
+			node->data = stoneBlockCreate((float[]){i * 32, j * 23 + 25}, game->assetManager.textures[ASSET_IMAGE_STONE_BLOCK]);
 			nodeAddChild(game->root, node);
+			game->staticColliders[game->staticColliderCount++] = node->data;
 		}
 }
 
@@ -137,10 +136,8 @@ void sortLinkedList(Node* head, Comparator compare) {
 
 int compareGo(GameObject* a, GameObject* b)
 {
-	return (a->rigidBody.boundingBox.y - a->sprite.center[1]) - (b->rigidBody.boundingBox.y - b->sprite.center[1]);
+	return (a->rigidBody.boundingBox.y - a->sprite.zIndex) - (b->rigidBody.boundingBox.y - b->sprite.zIndex);
 }
-
-SDL_Rect testRect = {100, 100, 100, 100};
 
 void gameRender(Game game)
 {
@@ -151,7 +148,6 @@ void gameRender(Game game)
 	traverseGraph(game.root, &game, renderComponentCallback);
 
 	SDL_SetRenderDrawColor(game.renderer, 255, 0, 0, 255);
-	SDL_RenderDrawRect(game.renderer, &testRect);
 	
 	SDL_RenderPresent(game.renderer);
 }
@@ -215,9 +211,11 @@ void gameRun(Game* game)
 		}
 		traverseGraph(game->root, game, (TraverseNodeCallback)updateComponentCallback);
 
-		SDL_FRect a = rectToRectf(testRect);
 
-		resolveCollision(&a, &hero->parent.rigidBody.boundingBox, true);
+		for(int i = 0; i < game->staticColliderCount; i++)
+		{
+			resolveCollision(&game->staticColliders[i]->rigidBody.boundingBox, &game->hero->parent.rigidBody.boundingBox, true);
+		}
 
 		// {
 

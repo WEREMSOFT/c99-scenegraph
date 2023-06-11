@@ -24,6 +24,7 @@ typedef struct
 	SDL_Texture* texture;
 	Animation animation;
 	int center[2];
+	int zIndex;
 	bool isAnimated;
 	bool isFlipped;
 } Sprite;
@@ -35,7 +36,7 @@ typedef struct
 	float speed;
 } RigidBody;
 
-typedef struct
+typedef struct GameObject
 {
 	Sprite sprite;
 	RigidBody rigidBody;
@@ -66,6 +67,19 @@ SDL_Rect processAnimationFrame(GameObject* _this)
 	animation->currentFrame = ((SDL_GetTicks() - animation->startTime) * animation->framesPerSecond / 1000) % animation->frameCount;
 	sprite->srcRect.x = animation->currentFrame * sprite->srcRect.w;
 	sprite->srcRect.y = animation->currentAnimation * sprite->srcRect.h;
+}
+
+void gameObjectDraw(GameObject* _this, Game* game)
+{
+	_this->sprite.destRect.x = (int)_this->rigidBody.boundingBox.x - _this->sprite.center[0];
+	_this->sprite.destRect.y = (int)_this->rigidBody.boundingBox.y - _this->sprite.center[1];
+	SDL_RenderCopyEx(game->renderer, _this->sprite.texture, &_this->sprite.srcRect, &_this->sprite.destRect, 0, NULL, _this->sprite.isFlipped?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
+
+	if(game->isDebugMode)
+	{
+		SDL_SetRenderDrawColor(game->renderer, 255, 0, 0, 255);
+		SDL_RenderDrawRectF(game->renderer, &_this->rigidBody.boundingBox);
+	}
 }
 
 #endif

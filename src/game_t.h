@@ -7,6 +7,9 @@
 #include "core.h"
 #include "core/assetManager.h"
 
+typedef struct GameObject GameObject;
+typedef struct RunningMan RunningMan;
+
 typedef struct Game
 {
 	SDL_Window* window;
@@ -18,5 +21,8 @@ typedef struct Game
 	bool isDebugMode;
 	float deltaTime;
 	int screenSize[2];
+	int staticColliderCount;
+	GameObject* staticColliders[150];
+	RunningMan* hero;
 } Game;
 #endif
