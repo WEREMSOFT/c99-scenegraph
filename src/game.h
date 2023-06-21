@@ -174,6 +174,18 @@ void resolveCollision(SDL_FRect *rectA, SDL_FRect *rectB, bool firstIsFixed)
 	}
 }
 
+void resolveCollisionsWithMap(Game* game)
+{
+	static int start = 1;
+
+	for(int i = start; i < game->staticColliderCount; i+=2)
+	{
+		resolveCollision(&game->staticColliders[i]->rigidBody.boundingBox, &game->hero->parent.rigidBody.boundingBox, true);
+	}
+
+	start = start == 1 ? 0 : 1;
+}
+
 void gameRun(Game* game)
 {
 	float lastFrameTime = SDL_GetTicks();
@@ -211,12 +223,8 @@ void gameRun(Game* game)
 		}
 		traverseGraph(game->root, game, (TraverseNodeCallback)updateComponentCallback);
 
+		resolveCollisionsWithMap(game);
 
-		for(int i = 0; i < game->staticColliderCount; i++)
-		{
-			resolveCollision(&game->staticColliders[i]->rigidBody.boundingBox, &game->hero->parent.rigidBody.boundingBox, true);
-		}
-		
 		gameRender(*game);
 	}
 }
