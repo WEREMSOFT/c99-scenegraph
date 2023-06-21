@@ -24,6 +24,7 @@ typedef struct
 	SDL_Texture* texture;
 	Animation animation;
 	int center[2];
+	int offset[2];
 	int zIndex;
 	bool isAnimated;
 	bool isFlipped;
@@ -71,8 +72,8 @@ SDL_Rect processAnimationFrame(GameObject* _this)
 
 void gameObjectDraw(GameObject* _this, Game* game)
 {
-	_this->sprite.destRect.x = (int)_this->rigidBody.boundingBox.x - _this->sprite.center[0];
-	_this->sprite.destRect.y = (int)_this->rigidBody.boundingBox.y - _this->sprite.center[1];
+	_this->sprite.destRect.x = (int)_this->rigidBody.boundingBox.x - _this->sprite.offset[0];
+	_this->sprite.destRect.y = (int)_this->rigidBody.boundingBox.y - _this->sprite.offset[1];
 	SDL_RenderCopyEx(game->renderer, _this->sprite.texture, &_this->sprite.srcRect, &_this->sprite.destRect, 0, NULL, _this->sprite.isFlipped?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
 
 	if(game->isDebugMode)

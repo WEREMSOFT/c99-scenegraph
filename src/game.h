@@ -136,7 +136,7 @@ void sortLinkedList(Node* head, Comparator compare) {
 
 int compareGo(GameObject* a, GameObject* b)
 {
-	return (a->rigidBody.boundingBox.y - a->sprite.zIndex) - (b->rigidBody.boundingBox.y - b->sprite.zIndex);
+	return (a->rigidBody.boundingBox.y - a->sprite.center[1] - a->sprite.zIndex) - (b->rigidBody.boundingBox.y - b->sprite.center[1] - b->sprite.zIndex);
 }
 
 void gameRender(Game game)
