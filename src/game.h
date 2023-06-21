@@ -216,59 +216,7 @@ void gameRun(Game* game)
 		{
 			resolveCollision(&game->staticColliders[i]->rigidBody.boundingBox, &game->hero->parent.rigidBody.boundingBox, true);
 		}
-
-		// {
-
-		// 	SDL_FRect result;
-		// 	SDL_FRect a = rectToRectf(testRect);
-		// 	SDL_FRect b = hero->parent.rigidBody.boundingBox;
-
-		// 	if(SDL_IntersectFRect(&a, &b, &result))
-		// 	{
-		// 		if(result.w < result.h)
-		// 		{
-		// 			if(result.x <= hero->parent.rigidBody.boundingBox.x)
-		// 				hero->parent.rigidBody.boundingBox.x += result.w;
-		// 			else
-		// 				hero->parent.rigidBody.boundingBox.x -= result.w;
-		// 		} else 
-		// 		{
-		// 			if(result.y <= hero->parent.rigidBody.boundingBox.y)
-		// 				hero->parent.rigidBody.boundingBox.y += result.h;
-		// 			else
-		// 				hero->parent.rigidBody.boundingBox.y -= result.h;
-		// 		}
-		// 	}
-		// }
-
-		// {
-		// 	SDL_Rect heroRect = hero->parent.sprite.destRect;
-		// 	heroRect.x = hero->parent.rigidBody.boundingBox.x;
-		// 	heroRect.y = hero->parent.rigidBody.boundingBox.y;
-
-		// 	SDL_FRect result;
-		// 	SDL_FRect a = rectToRectf(testRect);
-		// 	SDL_FRect b = rectToRectf(heroRect);
-
-		// 	if(SDL_IntersectFRect(&a, &b, &result))
-		// 	{
-		// 		if(result.w < result.h)
-		// 		{
-		// 			if(result.x < hero->parent.rigidBody.boundingBox.x)
-		// 				hero->parent.rigidBody.boundingBox.x += result.w;
-		// 			else
-		// 				hero->parent.rigidBody.boundingBox.x -= result.w;
-		// 		} else 
-		// 		{
-		// 			if(result.y < hero->parent.rigidBody.boundingBox.y)
-		// 				hero->parent.rigidBody.boundingBox.y += result.h;
-		// 			else
-		// 				hero->parent.rigidBody.boundingBox.y -= result.h;
-		// 		}
-		// 	}
-		// }
-
-
+		
 		gameRender(*game);
 	}
 }
