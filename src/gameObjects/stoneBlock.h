@@ -37,8 +37,8 @@ StoneBlock* stoneBlockCreate(float position[2], SDL_Texture* texture)
 	stoneBlock->parent.draw = (DrawFunction)stoneBlockDraw;
 
 	stoneBlock->parent.sprite.offset[0] = 0;
-	stoneBlock->parent.sprite.offset[1] = 20;
-	stoneBlock->parent.sprite.center[1] = 20;
+	stoneBlock->parent.sprite.offset[1] = 21;
+	stoneBlock->parent.sprite.center[1] = 0;
 	stoneBlock->parent.sprite.zIndex = 27;
 
 	stoneBlock->parent.sprite.isFlipped = false;

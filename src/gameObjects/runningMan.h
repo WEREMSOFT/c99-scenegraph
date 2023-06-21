@@ -126,6 +126,7 @@ RunningMan* runningManCreate(float position[2], SDL_Texture* texture)
 
 	runningMan->parent.sprite.offset[0] = 15;
 	runningMan->parent.sprite.offset[1] = 50;
+	runningMan->parent.sprite.center[1] = 20;
 
 	runningMan->parent.sprite.isFlipped = false;
 
